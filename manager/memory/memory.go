@@ -13,29 +13,35 @@
  * limitations under the License.
  ******************************************************************************/
 
-package main
+package memory
 
 import (
-	"os"
-	"eva/mock"
-	"fmt"
-	"eva/manager/memory"
+	"sync"
+	"eva/policy"
 )
 
-var hostname string
-func main() {
-	mem := inmemoryInit()
-	for _, pol := range mock.Polices {
-		mem.Create(pol)
+// MemoryManager is an in-memory (non-persistent) implementation of Manager.
+type MemoryManager struct {
+	Policies map[string]policy.Policy
+	sync.RWMutex
+}
+
+// NewMemoryManager constructs and initializes new MemoryManager with no policies.
+func NewMemoryManager() *MemoryManager {
+	return &MemoryManager{
+		Policies: map[string]policy.Policy{},
 	}
-	fmt.Println(mem)
-	fmt.Println(hostname)
 }
 
-func init() {
-	hostname, _ = os.Hostname()
-}
+// Create a new policy to MemoryManager.
+func (m *MemoryManager) Create(policy policy.Policy) error {
+	m.Lock()
+	defer m.Unlock()
 
-func inmemoryInit() *memory.MemoryManager {
-	return memory.NewMemoryManager()
+	//if _, found := m.Policies[policy.GetID()]; found {
+	//	return errors.New("Policy exists")
+	//}
+
+	m.Policies[policy.GetID()] = policy
+	return nil
 }

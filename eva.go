@@ -18,16 +18,16 @@ package eva
 // RequestContext is the expected request object.
 type RequestContext struct {
 	// Principal is the subject that is requesting access.
-	Principal string `json:"principal"`
+	Principal string `json:"principal,omitempty"`
 
 	// Action is the action that is requested on the resource.
-	Action string `json:"action"`
+	Action string `json:"action,omitempty"`
 
 	// Resource is the resource that access is requested to.
-	Resource string `json:"resource"`
+	Resource string `json:"resource,omitempty"`
 
-	// Condition is the request's environmental context.
-	Condition string `json:"condition"`
+	// todo:Condition is the request's environmental context.
+	//Condition string `json:"condition,omitempty"`
 }
 
 // Eva is responsible for deciding if principal p can perform action a on resource r with condition c.
