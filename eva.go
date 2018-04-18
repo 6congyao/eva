@@ -15,6 +15,13 @@
 
 package eva
 
+import (
+	"eva/manager"
+	"eva/matcher"
+	"eva/policy"
+	"eva/utils/errors"
+)
+
 // RequestContext is the expected request object.
 type RequestContext struct {
 	// Principal is the subject that is requesting access.
@@ -32,9 +39,106 @@ type RequestContext struct {
 
 // Eva is responsible for deciding if principal p can perform action a on resource r with condition c.
 type Eva interface {
-	// IsAllowed returns nil if principal p can perform action a on resource r with condition c or an error otherwise.
+	// Authorize returns nil if principal p can perform action a on resource r with condition c or an error otherwise.
 	//  if err := guard.Authorize(&Request{Resource: "article/1234", Action: "update", Principal: "peter"}); err != nil {
 	//    return errors.New("Not allowed")
 	//  }
 	Authorize(rc *[]RequestContext) error
+}
+
+// Authorizer Eva00 inspired by Ayanami Rei :P.
+type Eva00 struct {
+	Manager manager.Manager
+	matcher matcher.Matcher
+}
+
+func (e *Eva00) Matcher() matcher.Matcher {
+	if e.matcher == nil {
+		e.matcher = matcher.DefaultMatcher
+	}
+	return e.matcher
+}
+
+// Authorize returns nil if principal p can perform action a on resource r with condition c or an error otherwise.
+func (e *Eva00) Authorize(rcs []*RequestContext, keys []string) error {
+	policies, err := e.Manager.FindCandidates(keys)
+	if err != nil {
+		return err
+	}
+
+	// Although the manager is responsible of matching the policies, it might decide to just scan for
+	// subjects, it might return all policies, or it might have a different pattern matching than Golang.
+	// Thus, we need to make sure that we actually matched the right policies.
+	return e.Evaluate(rcs, policies)
+}
+
+// Evaluate returns nil if principal p has permission p on resource r with condition c for a given policy list or an error otherwise.
+// The Evaluate interface should be preferred since it uses the manager directly. This is a lower level interface for when you don't want to use the eva manager.
+func (e *Eva00) Evaluate(rcs []*RequestContext, policies policy.Policies) error {
+	var deciders = policy.Policies{}
+
+	// Iterate through all RequestContexts
+	for _, r := range rcs {
+		var allowed = false
+		// Iterate through all policies
+		for _, p := range policies {
+			for _, s := range p.GetStatements() {
+				// Does the action match with one of the statements?
+				// This is the first check because usually actions are a superset of get|update|delete|set
+				// and thus match faster.
+				if am, err := e.Matcher().Matches(p, s.GetActions(), r.Action); err != nil {
+					return err
+				} else if !am {
+					// no, continue to next statement
+					continue
+				}
+
+				// Does the principal match with one of the statements?
+				// There are usually less principals than resources which is why this is checked
+				// before checking for resources.
+				// Principal is optionally match in entity-based policy.
+				if principals := s.GetPrincipals(); len(principals) > 0 {
+					if pm, err := e.Matcher().Matches(p, principals, r.Principal); err != nil {
+						return err
+					} else if !pm {
+						// no, continue to next statement
+						continue
+					}
+				}
+
+				// Does the resource match with one of the statements?
+				// Resource is optionally match in resource-based policy.
+				if resources := s.GetResources(); len(resources) > 0 {
+					if rm, err := e.Matcher().Matches(p, s.GetResources(), r.Resource); err != nil {
+						return err
+					} else if !rm {
+						// no, continue to next policy
+						continue
+					}
+				}
+
+				// todo conditions
+				// Are the policies conditions met?
+				// This is checked first because it usually has a small complexity.
+
+				// Is the policies effect deny? If yes, this overrides all allow policies -> access denied.
+				if !s.AllowAccess() {
+					deciders = append(deciders, p)
+					//l.auditLogger().LogRejectedAccessRequest(r, policies, deciders)
+					return errors.NewErrExplicitlyDenied()
+				}
+
+				allowed = true
+				deciders = append(deciders, p)
+			}
+
+		}
+
+		if !allowed {
+			//l.auditLogger().LogRejectedAccessRequest(r, policies, deciders)
+			return errors.NewErrDefaultDenied()
+		}
+	}
+
+	return nil
 }

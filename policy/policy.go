@@ -15,6 +15,10 @@
 
 package policy
 
+import (
+	"strings"
+)
+
 // AllowAccess should be used as effect for policies that allow access.
 const AllowAccess = "allow"
 
@@ -22,7 +26,7 @@ const AllowAccess = "allow"
 const DenyAccess = "deny"
 
 // Policies is an array of policies.
-type Policies *[]Policy
+type Policies []Policy
 
 // Policy represent a policy model.
 type Policy interface {
@@ -43,10 +47,18 @@ type Policy interface {
 
 	// GetStatement returns the policy statements.
 	GetStatements() Statements
+
+	// GetStartDelimiter returns the delimiter which identifies the beginning of a regular expression.
+	GetStartDelimiter() byte
+
+	// GetEndDelimiter returns the delimiter which identifies the end of a regular expression.
+	GetEndDelimiter() byte
+
+	ReplaceWildcard(string) string
 }
 
 // Statements is an array of Statement.
-type Statements *[]Statement
+type Statements []Statement
 
 type Statement interface {
 	// GetPrincipal returns the policies principals.
@@ -64,24 +76,18 @@ type Statement interface {
 	// AllowAccess returns true if the effect is allow, otherwise false.
 	AllowAccess() bool
 
-	// GetStartDelimiter returns the delimiter which identifies the beginning of a regular expression.
-	//GetStartDelimiter() byte
-
-	// GetEndDelimiter returns the delimiter which identifies the end of a regular expression.
-	//GetEndDelimiter() byte
-
 	// todo: GetConditions returns the policies conditions.
 	//GetConditions() Conditions
 }
 
 // DefaultPolicy is the default implementation of the policy interface.
 type DefaultPolicy struct {
-	ID          string     `json:"id,omitempty"`
-	Version     string     `json:"version,omitempty"`
-	Name        string     `json:"name,omitempty"`
-	Urn         string     `json:"urn,omitempty"`
-	Description string     `json:"description,omitempty"`
-	Statements  Statements `json:"statements,omitempty"`
+	ID          string             `json:"id,omitempty"`
+	Version     string             `json:"version,omitempty"`
+	Name        string             `json:"name,omitempty"`
+	Urn         string             `json:"urn,omitempty"`
+	Description string             `json:"description,omitempty"`
+	Statements  []DefaultStatement `json:"statement,omitempty"`
 }
 
 // GetID returns the policy id.
@@ -111,14 +117,35 @@ func (p *DefaultPolicy) GetDescription() string {
 
 // GetStatements returns the policy Statements.
 func (p *DefaultPolicy) GetStatements() Statements {
-	return p.Statements
+	i := Statements{}
+	for n := range p.Statements {
+		i = append(i, &p.Statements[n])
+	}
+
+	return i
+}
+
+func (p *DefaultPolicy) GetStartDelimiter() byte {
+	return '<'
+}
+
+func (p *DefaultPolicy) GetEndDelimiter() byte {
+	return '>'
+}
+
+func (p *DefaultPolicy) ReplaceWildcard(s string) string {
+	if strings.Count(s, "<.*>") == 0 {
+		return strings.Replace(s, "*", "<.*>", -1)
+	}
+
+	return s
 }
 
 type DefaultStatement struct {
-	Principals []string `json:"principals,omitempty"`
-	Effect     string   `json:"effect,omitempty"`
-	Actions    []string `json:"actions,omitempty"`
-	Resources  []string `json:"resources,omitempty"`
+	Principals []string `json:"principal,omitempty"`
+	Effect     string   `json:"effect,omitempty" binding:"required"`
+	Actions    []string `json:"action,omitempty" binding:"required"`
+	Resources  []string `json:"resource,omitempty"`
 
 	//todo: Conditions  Conditions `json:"conditions,omitempty"`
 }

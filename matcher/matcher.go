@@ -13,30 +13,15 @@
  * limitations under the License.
  ******************************************************************************/
 
-package manager
+package matcher
 
 import (
 	"eva/policy"
+	"eva/matcher/regexp"
 )
 
-// Manager is responsible for managing and persisting policies.
-type Manager interface {
-
-	// Create persists the policy.
-	Create(policy policy.Policy) error
-
-	// Update updates an existing policy.
-	Update(policy policy.Policy) error
-
-	// Get retrieves a policy.
-	Get(id string) (policy.Policy, error)
-
-	// Delete removes a policy.
-	Delete(id string) error
-
-	// GetAll retrieves all policies.
-	GetAll(limit, offset int64) (policy.Policies, error)
-
-	// Find related policies by entity keys
-	FindCandidates(keys []string)(policy.Policies, error)
+type Matcher interface {
+	Matches(p policy.Policy, haystack []string, needle string) (matches bool, error error)
 }
+
+var DefaultMatcher = regexp.NewRegexpMatcher(512)

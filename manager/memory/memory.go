@@ -16,20 +16,20 @@
 package memory
 
 import (
-	"sync"
 	"eva/policy"
+	"sync"
 )
 
 // MemoryManager is an in-memory (non-persistent) implementation of Manager.
 type MemoryManager struct {
-	Policies map[string]policy.Policy
+	Policies map[string]policy.Policies
 	sync.RWMutex
 }
 
 // NewMemoryManager constructs and initializes new MemoryManager with no policies.
 func NewMemoryManager() *MemoryManager {
 	return &MemoryManager{
-		Policies: map[string]policy.Policy{},
+		Policies: map[string]policy.Policies{},
 	}
 }
 
@@ -38,10 +38,62 @@ func (m *MemoryManager) Create(policy policy.Policy) error {
 	m.Lock()
 	defer m.Unlock()
 
-	//if _, found := m.Policies[policy.GetID()]; found {
-	//	return errors.New("Policy exists")
+	//if policies, found := m.Policies[policy.GetID()]; found {
+	//	policies = append(policies, policy)
 	//}
 
-	m.Policies[policy.GetID()] = policy
+	m.Policies[policy.GetID()] = append(m.Policies[policy.GetID()], policy)
+
 	return nil
+}
+
+func (m *MemoryManager) FindCandidates(keys []string) (policy.Policies, error) {
+	m.RLock()
+	defer m.RUnlock()
+	var ps policy.Policies
+	for _, key := range keys {
+		if v, found := m.Policies[key]; found {
+			ps = append(ps, v...)
+		}
+	}
+
+	return ps, nil
+}
+
+// Get retrieves a policy.
+func (m *MemoryManager) Get(id string) (policy.Policy, error) {
+	m.RLock()
+	defer m.RUnlock()
+
+
+	return nil, nil
+}
+
+// Delete removes a policy.
+func (m *MemoryManager) Delete(id string) error {
+	m.Lock()
+	defer m.Unlock()
+	delete(m.Policies, id)
+	return nil
+}
+
+// Update updates an existing policy.
+func (m *MemoryManager) Update(policy policy.Policy) error {
+	m.Lock()
+	defer m.Unlock()
+	m.Policies[policy.GetID()] = nil
+	return nil
+}
+
+// GetAll returns all policies.
+func (m *MemoryManager) GetAll(limit, offset int64) (policy.Policies, error) {
+	ps := policy.Policies{}
+
+	for _, mp := range m.Policies {
+		for _, p := range mp {
+			ps = append(ps, p)
+		}
+	}
+
+	return ps, nil
 }
