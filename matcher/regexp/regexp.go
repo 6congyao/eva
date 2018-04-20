@@ -60,6 +60,7 @@ func (m *RegexpMatcher) Matches(p policy.Policy, haystack []string, needle strin
 	var reg *regexp.Regexp
 	var err error
 	for _, h := range haystack {
+		// Wildcard '*' supported
 		h = p.ReplaceWildcard(h)
 		// This means that the current haystack item does not contain a regular expression
 		if strings.Count(h, string(p.GetStartDelimiter())) == 0 {

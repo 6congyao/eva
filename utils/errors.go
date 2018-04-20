@@ -13,7 +13,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package errors
+package utils
 
 import (
 	"net/http"
@@ -23,7 +23,7 @@ import (
 const DefaultDenied = "Default"
 const ExplicitlyDenied = "Explicit"
 
-type errorWithContext interface {
+type ErrorWithContext interface {
 
 	// StatusCode returns the status code of this error.
 	StatusCode() int
@@ -32,6 +32,8 @@ type errorWithContext interface {
 	Causer() string
 
 	Details() string
+
+	Error() string
 }
 
 type ErrDefaultDenied struct {

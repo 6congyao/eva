@@ -19,11 +19,11 @@ import (
 	"eva"
 	"eva/manager/memory"
 	"eva/mock"
+	"eva/policy"
+	"eva/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
-
-	"eva/policy"
 )
 
 var hostname string
@@ -38,8 +38,9 @@ type AuthRequestInput struct {
 	// Action is the action that is requested on the resource.
 	Action string `json:"action" binding:"required"`
 
-	// Subejct is the subject that is requesting access.
-	Subject []string `json:"subject" binding:"required"`
+	// Subject is the Query keys that is requesting access.
+	// Support both string and []string
+	Subject interface{} `json:"subject" binding:"required"`
 }
 
 func main() {
@@ -74,7 +75,10 @@ func auth(c *gin.Context) {
 	json := &AuthRequestInput{}
 
 	if err := c.ShouldBindJSON(json); err == nil {
-		requests := []*eva.RequestContext{}
+		//requests := []*eva.RequestContext{}
+		var requests []*eva.RequestContext = nil
+
+		keys, _ := utils.ItoS(json.Subject)
 
 		request := &eva.RequestContext{
 			Principal: json.Principal,
@@ -83,21 +87,15 @@ func auth(c *gin.Context) {
 		}
 		requests = append(requests, request)
 
-		err := warden.Authorize(requests, json.Subject)
+		err := warden.Authorize(requests, keys)
 		if err != nil {
-			//ret := errors.Cause(err)
-			//ret2 := ladon.ErrRequestDenied
-			//if ret == ret2 {
-			//	fmt.Printf("Type: %T\n", errors.Cause(err))
-			//}
-			//switch et := errors.Cause(err).(type) {
-			//case *ladon.errorWithContext:
-			//	// handle specifically
-			c.JSON(http.StatusForbidden, gin.H{"status": err.Error(), "from": hostname})
-			//default:
-			//	// unknown error
-			//	c.JSON(http.StatusForbidden, gin.H{"status": et})
-			//}
+			switch e := err.(type) {
+
+			case utils.ErrorWithContext:
+				c.JSON(e.StatusCode(), gin.H{"type": e.Details(), "status": e.Error(), "from": hostname})
+			default:
+				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			}
 
 		} else {
 			c.JSON(http.StatusOK, gin.H{"status": "Allow", "from": hostname})

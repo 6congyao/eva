@@ -36,13 +36,13 @@ func delimiterIndices(s string, delimiterStart, delimiterEnd byte) ([]int, error
 			if level--; level == 0 {
 				idxs = append(idxs, idx, i+1)
 			} else if level < 0 {
-				return nil, fmt.Errorf(`Unbalanced braces in "%q"`, s)
+				return nil, fmt.Errorf(`unbalanced braces in "%q"`, s)
 			}
 		}
 	}
 
 	if level != 0 {
-		return nil, fmt.Errorf(`Unbalanced braces in "%q"`, s)
+		return nil, fmt.Errorf(`unbalanced braces in "%q"`, s)
 	}
 
 	return idxs, nil

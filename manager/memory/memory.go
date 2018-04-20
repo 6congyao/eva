@@ -65,7 +65,6 @@ func (m *MemoryManager) Get(id string) (policy.Policy, error) {
 	m.RLock()
 	defer m.RUnlock()
 
-
 	return nil, nil
 }
 

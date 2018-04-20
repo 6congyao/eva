@@ -19,7 +19,7 @@ import (
 	"eva/manager"
 	"eva/matcher"
 	"eva/policy"
-	"eva/utils/errors"
+	"eva/utils"
 )
 
 // RequestContext is the expected request object.
@@ -43,10 +43,10 @@ type Eva interface {
 	//  if err := guard.Authorize(&Request{Resource: "article/1234", Action: "update", Principal: "peter"}); err != nil {
 	//    return errors.New("Not allowed")
 	//  }
-	Authorize(rc *[]RequestContext) error
+	Authorize(rcs []*RequestContext, keys []string) error
 }
 
-// Authorizer Eva00 inspired by Ayanami Rei :P.
+// Eva instance Eva00 inspired by "Ayanami Rei" :P.
 type Eva00 struct {
 	Manager manager.Manager
 	matcher matcher.Matcher
@@ -67,13 +67,13 @@ func (e *Eva00) Authorize(rcs []*RequestContext, keys []string) error {
 	}
 
 	// Although the manager is responsible of matching the policies, it might decide to just scan for
-	// subjects, it might return all policies, or it might have a different pattern matching than Golang.
+	// principal, it might return all policies, or it might have a different pattern matching.
 	// Thus, we need to make sure that we actually matched the right policies.
 	return e.Evaluate(rcs, policies)
 }
 
 // Evaluate returns nil if principal p has permission p on resource r with condition c for a given policy list or an error otherwise.
-// The Evaluate interface should be preferred since it uses the manager directly. This is a lower level interface for when you don't want to use the eva manager.
+// The Authorize interface should be preferred since it uses the manager directly. This is a lower level interface for when you don't want to use the eva manager.
 func (e *Eva00) Evaluate(rcs []*RequestContext, policies policy.Policies) error {
 	var deciders = policy.Policies{}
 
@@ -125,7 +125,7 @@ func (e *Eva00) Evaluate(rcs []*RequestContext, policies policy.Policies) error 
 				if !s.AllowAccess() {
 					deciders = append(deciders, p)
 					//l.auditLogger().LogRejectedAccessRequest(r, policies, deciders)
-					return errors.NewErrExplicitlyDenied()
+					return utils.NewErrExplicitlyDenied()
 				}
 
 				allowed = true
@@ -134,9 +134,10 @@ func (e *Eva00) Evaluate(rcs []*RequestContext, policies policy.Policies) error 
 
 		}
 
+		// Request was denied by default
 		if !allowed {
 			//l.auditLogger().LogRejectedAccessRequest(r, policies, deciders)
-			return errors.NewErrDefaultDenied()
+			return utils.NewErrDefaultDenied()
 		}
 	}
 
