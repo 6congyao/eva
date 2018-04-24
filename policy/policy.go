@@ -54,6 +54,7 @@ type Policy interface {
 	// GetEndDelimiter returns the delimiter which identifies the end of a regular expression.
 	GetEndDelimiter() byte
 
+	// Support '*' wildcard
 	ReplaceWildcard(string) string
 }
 

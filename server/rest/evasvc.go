@@ -24,24 +24,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
+	"eva/agent/json"
 )
 
 var hostname string
 var warden *eva.Eva00
-
-// Binding from JSON
-type AuthRequestInput struct {
-	Principal string `json:"principal"`
-	// Resource is the resource that access is requested to.
-	Resource string `json:"resource" binding:"required"`
-
-	// Action is the action that is requested on the resource.
-	Action string `json:"action" binding:"required"`
-
-	// Subject is the Query keys that is requesting access.
-	// Support both string and []string
-	Subject interface{} `json:"subject" binding:"required"`
-}
 
 func main() {
 	iamInit()
@@ -60,6 +47,7 @@ func iamInit() {
 
 	warden = &eva.Eva00{
 		Manager: memoryInit(),
+		Agent: agentInit(),
 	}
 
 	for _, pol := range mock.Polices {
@@ -71,23 +59,16 @@ func memoryInit() *memory.MemoryManager {
 	return memory.NewMemoryManager()
 }
 
+func agentInit() *json.JsonAgent {
+	return json.NewJsonAgent()
+}
+
 func auth(c *gin.Context) {
-	json := &AuthRequestInput{}
 
-	if err := c.ShouldBindJSON(json); err == nil {
-		//requests := []*eva.RequestContext{}
-		var requests []*eva.RequestContext = nil
+	if err := c.ShouldBindJSON(warden.Agent.Payload()); err == nil {
+		keys, rcs, _ := warden.Agent.NormalizeRequests()
 
-		keys, _ := utils.ItoS(json.Subject)
-
-		request := &eva.RequestContext{
-			Principal: json.Principal,
-			Action:    json.Action,
-			Resource:  json.Resource,
-		}
-		requests = append(requests, request)
-
-		err := warden.Authorize(requests, keys)
+		err := warden.Authorize(rcs, keys)
 		if err != nil {
 			switch e := err.(type) {
 

@@ -20,22 +20,8 @@ import (
 	"eva/matcher"
 	"eva/policy"
 	"eva/utils"
+	"eva/agent"
 )
-
-// RequestContext is the expected request object.
-type RequestContext struct {
-	// Principal is the subject that is requesting access.
-	Principal string `json:"principal,omitempty"`
-
-	// Action is the action that is requested on the resource.
-	Action string `json:"action,omitempty"`
-
-	// Resource is the resource that access is requested to.
-	Resource string `json:"resource,omitempty"`
-
-	// todo:Condition is the request's environmental context.
-	//Condition string `json:"condition,omitempty"`
-}
 
 // Eva is responsible for deciding if principal p can perform action a on resource r with condition c.
 type Eva interface {
@@ -43,13 +29,14 @@ type Eva interface {
 	//  if err := guard.Authorize(&Request{Resource: "article/1234", Action: "update", Principal: "peter"}); err != nil {
 	//    return errors.New("Not allowed")
 	//  }
-	Authorize(rcs []*RequestContext, keys []string) error
+	Authorize(rcs []*agent.RequestContext, keys []string) error
 }
 
 // Eva instance Eva00 inspired by "Ayanami Rei" :P.
 type Eva00 struct {
 	Manager manager.Manager
 	matcher matcher.Matcher
+	Agent agent.Agent
 }
 
 func (e *Eva00) Matcher() matcher.Matcher {
@@ -60,7 +47,7 @@ func (e *Eva00) Matcher() matcher.Matcher {
 }
 
 // Authorize returns nil if principal p can perform action a on resource r with condition c or an error otherwise.
-func (e *Eva00) Authorize(rcs []*RequestContext, keys []string) error {
+func (e *Eva00) Authorize(rcs []*agent.RequestContext, keys []string) error {
 	policies, err := e.Manager.FindCandidates(keys)
 	if err != nil {
 		return err
@@ -74,7 +61,7 @@ func (e *Eva00) Authorize(rcs []*RequestContext, keys []string) error {
 
 // Evaluate returns nil if principal p has permission p on resource r with condition c for a given policy list or an error otherwise.
 // The Authorize interface should be preferred since it uses the manager directly. This is a lower level interface for when you don't want to use the eva manager.
-func (e *Eva00) Evaluate(rcs []*RequestContext, policies policy.Policies) error {
+func (e *Eva00) Evaluate(rcs []*agent.RequestContext, policies policy.Policies) error {
 	var deciders = policy.Policies{}
 
 	// Iterate through all RequestContexts
