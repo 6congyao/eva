@@ -36,7 +36,6 @@ type Eva interface {
 type Eva00 struct {
 	Manager manager.Manager
 	matcher matcher.Matcher
-	Agent agent.Agent
 }
 
 func (e *Eva00) Matcher() matcher.Matcher {

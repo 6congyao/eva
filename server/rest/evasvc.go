@@ -17,6 +17,7 @@ package main
 
 import (
 	"eva"
+	"eva/agent"
 	"eva/manager/memory"
 	"eva/mock"
 	"eva/policy"
@@ -24,7 +25,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
-	"eva/agent/json"
 )
 
 var hostname string
@@ -47,10 +47,9 @@ func iamInit() {
 
 	warden = &eva.Eva00{
 		Manager: memoryInit(),
-		Agent: agentInit(),
 	}
 
-	for _, pol := range mock.Polices {
+	for _, pol := range mock.Policies {
 		warden.Manager.Create(pol)
 	}
 }
@@ -59,15 +58,10 @@ func memoryInit() *memory.MemoryManager {
 	return memory.NewMemoryManager()
 }
 
-func agentInit() *json.JsonAgent {
-	return json.NewJsonAgent()
-}
-
 func auth(c *gin.Context) {
-
-	if err := c.ShouldBindJSON(warden.Agent.Payload()); err == nil {
-		keys, rcs, _ := warden.Agent.NormalizeRequests()
-
+	rag := agent.NewReqAgent()
+	if err := c.ShouldBindJSON(rag.Payload()); err == nil {
+		keys, rcs, _ := rag.NormalizeRequests()
 		err := warden.Authorize(rcs, keys)
 		if err != nil {
 			switch e := err.(type) {
@@ -88,20 +82,20 @@ func auth(c *gin.Context) {
 }
 
 func getPolicy(c *gin.Context) {
-	polices, err := warden.Manager.GetAll(100, 0)
+	policies, err := warden.Manager.GetAll(100, 0)
 
 	if err == nil {
-		c.JSON(http.StatusOK, gin.H{"polices": polices})
+		c.JSON(http.StatusOK, gin.H{"policies": policies})
 	} else {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
 }
 
 func createPolicy(c *gin.Context) {
-	jp := &policy.DefaultPolicy{}
+	dp := &policy.DefaultPolicy{}
 
-	if err := c.ShouldBindJSON(jp); err == nil {
-		warden.Manager.Create(jp)
+	if err := c.ShouldBindJSON(dp); err == nil {
+		warden.Manager.Create(dp)
 		c.JSON(http.StatusOK, gin.H{"status": "create successfully", "from": hostname})
 	} else {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

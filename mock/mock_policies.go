@@ -18,7 +18,7 @@ package mock
 import "eva/policy"
 
 // A bunch of exemplary policies
-var Polices = []policy.Policy{
+var Policies = []policy.Policy{
 	&policy.DefaultPolicy{
 		ID:          "1",
 		Description: `This policy allows entity to put and get on qstor service at path /foo/*.`,

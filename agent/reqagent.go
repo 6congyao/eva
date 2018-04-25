@@ -16,15 +16,20 @@
 package agent
 
 import (
-	"eva/policy"
+	"eva/utils"
 )
 
 // Binding from JSON
 type AuthRequestInput struct {
 	// Subject is the Query keys that is requesting access.
-	// Support both string and []string
-	Subject interface{}          `json:"subject" binding:"required"`
+	// Support both string and []string.
+	Subject interface{} `json:"subject" binding:"required"`
+
+	// Payload is the array which describe the access intention.
+	// MUST be [].
 	Payload []AuthRequestPayload `json:"payload" binding:"required"`
+
+	Id string `json:"id" binding:"required"`
 }
 
 // Binding from JSON
@@ -56,8 +61,31 @@ type RequestContext struct {
 	//Condition string `json:"condition,omitempty"`
 }
 
-type Agent interface {
-	NormalizeRequests() ([]string, []*RequestContext, error)
-	NormalizePolicies() (policy.Policies, error)
-	Payload() interface{}
+type ReqAgent struct {
+	RequestInput AuthRequestInput
+}
+
+func NewReqAgent() *ReqAgent {
+	return &ReqAgent{}
+}
+
+func (ra *ReqAgent) NormalizeRequests() ([]string, []*RequestContext, error) {
+	keys, err := utils.ItoS(ra.RequestInput.Subject)
+	if err != nil {
+		return nil, nil, err
+	}
+	var rcs []*RequestContext = nil
+	for _, v := range ra.RequestInput.Payload {
+		request := &RequestContext{
+			Principal: v.Principal,
+			Action:    v.Action,
+			Resource:  v.Resource,
+		}
+		rcs = append(rcs, request)
+	}
+	return keys, rcs, nil
+}
+
+func (ra *ReqAgent) Payload() interface{} {
+	return &ra.RequestInput
 }

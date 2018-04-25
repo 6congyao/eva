@@ -26,7 +26,7 @@ import (
 type RegexpMatcher struct {
 	*lru.Cache
 
-	C map[string]*regexp.Regexp
+	//C map[string]*regexp.Regexp
 }
 
 func NewRegexpMatcher(size int) *RegexpMatcher {

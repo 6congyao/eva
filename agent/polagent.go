@@ -13,40 +13,12 @@
  * limitations under the License.
  ******************************************************************************/
 
-package json
+package agent
 
-import (
-	"eva/policy"
-	"eva/agent"
-	"eva/utils"
-)
-
-type JsonAgent struct {
-	RequestInput agent.AuthRequestInput
+type PolAgent struct {
 }
 
-func NewJsonAgent() *JsonAgent{
-	return &JsonAgent{}
-}
+func (pa *PolAgent)NormalizePolicies() (error) {
 
-func (ja *JsonAgent)NormalizeRequests() ([]string, []*agent.RequestContext, error) {
-	keys, _ := utils.ItoS(ja.RequestInput.Subject)
-	var rcs []*agent.RequestContext = nil
-	for _, v := range ja.RequestInput.Payload {
-		request := &agent.RequestContext{
-			Principal: v.Principal,
-			Action:    v.Action,
-			Resource:  v.Resource,
-		}
-		rcs = append(rcs, request)
-	}
-	return keys, rcs, nil
-}
-
-func (ja *JsonAgent)NormalizePolicies() (policy.Policies, error) {
-	return nil, nil
-}
-
-func (ja *JsonAgent)Payload() (interface{}) {
-	return &ja.RequestInput
+	return nil
 }
