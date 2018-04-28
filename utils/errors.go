@@ -16,8 +16,8 @@
 package utils
 
 import (
-	"net/http"
 	"errors"
+	"net/http"
 )
 
 const DefaultDenied = "Default"
@@ -31,23 +31,25 @@ type ErrorWithContext interface {
 	// Causer returns the info that caused the error, if applicable.
 	Causer() string
 
+	// Details returns deny type.
 	Details() string
 
+	// Error returns the messages.
 	Error() string
 }
 
 type ErrDefaultDenied struct {
-	code   int
-	causer string
+	code    int
+	causer  string
 	details string
 	error
 }
 
 func NewErrDefaultDenied() error {
 	return &ErrDefaultDenied{
-		error:  errors.New("request was denied by default"),
-		code:   http.StatusForbidden,
-		causer: http.StatusText(http.StatusForbidden),
+		error:   errors.New("request was denied by default (no matching statements)"),
+		code:    http.StatusForbidden,
+		causer:  http.StatusText(http.StatusForbidden),
 		details: DefaultDenied,
 	}
 }
@@ -57,28 +59,28 @@ func (edd *ErrDefaultDenied) StatusCode() int {
 	return edd.code
 }
 
-// Causer returns the causer of this error.
+// Causer returns the info that caused the error, if applicable.
 func (edd *ErrDefaultDenied) Causer() string {
 	return edd.causer
 }
 
-// Details returns details on the error, if applicable.
+// Details returns deny type.
 func (edd *ErrDefaultDenied) Details() string {
 	return edd.details
 }
 
 type ErrExplicitlyDenied struct {
-	code   int
-	causer string
+	code    int
+	causer  string
 	details string
 	error
 }
 
 func NewErrExplicitlyDenied() error {
 	return &ErrExplicitlyDenied{
-		error:  errors.New("request was explicitly denied"),
-		code:   http.StatusForbidden,
-		causer: http.StatusText(http.StatusForbidden),
+		error:   errors.New("request was explicitly denied"),
+		code:    http.StatusForbidden,
+		causer:  http.StatusText(http.StatusForbidden),
 		details: ExplicitlyDenied,
 	}
 }
@@ -88,12 +90,12 @@ func (eed *ErrExplicitlyDenied) StatusCode() int {
 	return eed.code
 }
 
-// StatusCode returns the status code of this error.
+// Causer returns the info that caused the error, if applicable.
 func (eed *ErrExplicitlyDenied) Causer() string {
 	return eed.causer
 }
 
-// Details returns details on the error, if applicable.
+// Details returns deny type.
 func (eed *ErrExplicitlyDenied) Details() string {
 	return eed.details
 }

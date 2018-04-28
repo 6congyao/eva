@@ -16,17 +16,15 @@
 package regexp
 
 import (
-	"regexp"
-	"strings"
-	"eva/utils/lru"
 	"eva/policy"
 	"eva/utils/compiler"
+	"eva/utils/lru"
+	"regexp"
+	"strings"
 )
 
 type RegexpMatcher struct {
 	*lru.Cache
-
-	//C map[string]*regexp.Regexp
 }
 
 func NewRegexpMatcher(size int) *RegexpMatcher {
@@ -34,7 +32,7 @@ func NewRegexpMatcher(size int) *RegexpMatcher {
 		size = 512
 	}
 
-	// golang-lru only returns an error if the cache's size is 0. This, we can safely ignore this error.
+	// lru only returns an error if the cache's size is 0. This, we can safely ignore this error.
 	cache, _ := lru.New(size)
 	return &RegexpMatcher{
 		Cache: cache,

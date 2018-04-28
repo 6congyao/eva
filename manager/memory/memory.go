@@ -38,10 +38,6 @@ func (m *MemoryManager) Create(policy policy.Policy) error {
 	m.Lock()
 	defer m.Unlock()
 
-	//if policies, found := m.Policies[policy.GetID()]; found {
-	//	policies = append(policies, policy)
-	//}
-
 	m.Policies[policy.GetID()] = append(m.Policies[policy.GetID()], policy)
 
 	return nil

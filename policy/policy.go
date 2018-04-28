@@ -19,11 +19,12 @@ import (
 	"strings"
 )
 
-// AllowAccess should be used as effect for policies that allow access.
-const AllowAccess = "allow"
-
-// DenyAccess should be used as effect for policies that deny access.
-const DenyAccess = "deny"
+const (
+	// AllowAccess should be used as effect for policies that allow access.
+	AllowAccess = "allow"
+	// DenyAccess should be used as effect for policies that deny access.
+	DenyAccess = "deny"
+)
 
 // Policies is an array of policies.
 type Policies []Policy
@@ -151,7 +152,7 @@ type DefaultStatement struct {
 	//todo: Conditions  Conditions `json:"conditions,omitempty"`
 }
 
-// GetSubjects returns the policies subjects.
+// GetPrincipals returns the policies principals.
 func (s *DefaultStatement) GetPrincipals() []string {
 	return s.Principals
 }
