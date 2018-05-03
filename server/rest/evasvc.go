@@ -67,7 +67,13 @@ func auth(c *gin.Context) {
 			switch e := err.(type) {
 
 			case utils.ErrorWithContext:
-				c.JSON(e.StatusCode(), gin.H{"type": e.Details(), "status": e.Error(), "from": hostname})
+				c.JSON(e.Code(), gin.H{
+					"type": e.Causer(),
+					"status": e.Error(),
+					"source": e.Source(),
+					"decider": e.Decider(),
+					"from": hostname,
+					})
 			default:
 				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			}

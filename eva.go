@@ -61,7 +61,9 @@ func (e *Eva00) Authorize(rcs []*agent.RequestContext, keys []string) error {
 // Evaluate returns nil if principal p has permission p on resource r with condition c for a given policy list or an error otherwise.
 // The Authorize interface should be preferred since it uses the manager directly. This is a lower level interface for when you don't want to use the eva manager.
 func (e *Eva00) Evaluate(rcs []*agent.RequestContext, policies policy.Policies) error {
-	var deciders = policy.Policies{}
+	//var deciders = policy.Policies{}
+	var allowDeciders = policy.Policies{}
+	var denyDeciders = policy.Policies{}
 
 	// Iterate through all RequestContexts
 	for _, r := range rcs {
@@ -109,21 +111,20 @@ func (e *Eva00) Evaluate(rcs []*agent.RequestContext, policies policy.Policies) 
 
 				// Is the policies effect deny? If yes, this overrides all allow policies -> access denied.
 				if !s.AllowAccess() {
-					deciders = append(deciders, p)
+					denyDeciders = append(denyDeciders, p)
 					//l.auditLogger().LogRejectedAccessRequest(r, policies, deciders)
-					return utils.NewErrExplicitlyDenied()
+					return utils.NewErrExplicitlyDenied(r, p)
 				}
 
 				allowed = true
-				deciders = append(deciders, p)
+				allowDeciders = append(allowDeciders, p)
 			}
-
 		}
 
 		// Request was denied by default
 		if !allowed {
 			//l.auditLogger().LogRejectedAccessRequest(r, policies, deciders)
-			return utils.NewErrDefaultDenied()
+			return utils.NewErrDefaultDenied(r)
 		}
 	}
 

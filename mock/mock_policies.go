@@ -54,7 +54,7 @@ var Policies = []policy.Policy{
 				Resources:  []string{"qrn:qcs:qstor:::bar/*"},
 			},
 			{
-				Principals: []string{"*"},
+				//Principals: []string{"*"},
 				Effect:     policy.DenyAccess,
 				Actions:    []string{"qstor:Put*"},
 				Resources:  []string{"qrn:qcs:qstor:::bar/*"},
