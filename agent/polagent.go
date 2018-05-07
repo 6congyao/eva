@@ -15,10 +15,76 @@
 
 package agent
 
-type PolAgent struct {
+import (
+	"encoding/json"
+	"eva/policy"
+
+	"eva/utils"
+
+)
+
+// DefaultPolicy is the default implementation of the policy interface.
+type PolicyInput struct {
+	Version     string           `json:"version,omitempty"`
+	Description string           `json:"description,omitempty"`
+	Statements  []StatementInput `json:"statement,omitempty" binding:"required"`
 }
 
-func (pa *PolAgent)NormalizePolicies() (error) {
+type StatementInput struct {
+	Principals interface{} `json:"principal,omitempty"`
+	Effect     string      `json:"effect,omitempty" binding:"required"`
+	Actions    interface{} `json:"action,omitempty" binding:"required"`
+	Resources  interface{} `json:"resource,omitempty"`
 
-	return nil
+	//todo: Conditions  Conditions `json:"conditions,omitempty"`
+}
+
+type PolAgent struct {
+	Policies []string
+}
+
+func NewPolAgent(ps []string) *PolAgent {
+	if ps != nil {
+		return &PolAgent{Policies: ps}
+	}
+	return &PolAgent{Policies: []string{}}
+}
+
+func (pa PolAgent) NormalizePolicies() (policy.Policies, error) {
+	var policies policy.Policies = nil
+
+	for _, p := range pa.Policies {
+		pi := &PolicyInput{}
+		err := json.Unmarshal([]byte(p), pi)
+		if err != nil {
+			return nil, err
+		}
+
+		var statements []policy.DefaultStatement = nil
+
+		for _, s := range pi.Statements {
+			statement := &policy.DefaultStatement{
+				Principals: utils.ItoS(s.Principals),
+				Effect: s.Effect,
+				Actions: utils.ItoS(s.Actions),
+				Resources: utils.ItoS(s.Resources),
+			}
+
+			statements = append(statements, *statement)
+		}
+
+		policy := &policy.DefaultPolicy{
+			Version: pi.Version,
+			Description: pi.Description,
+			Statements: statements,
+		}
+
+		policies = append(policies, policy)
+	}
+
+	return policies, nil
+}
+
+func (pa PolAgent) Payload() interface{} {
+	return &pa.Policies
 }

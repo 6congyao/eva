@@ -89,7 +89,7 @@ type DefaultPolicy struct {
 	Name        string             `json:"name,omitempty"`
 	Urn         string             `json:"urn,omitempty"`
 	Description string             `json:"description,omitempty"`
-	Statements  []DefaultStatement `json:"statement,omitempty"`
+	Statements  []DefaultStatement `json:"statement,omitempty" binding:"required"`
 }
 
 // GetID returns the policy id.

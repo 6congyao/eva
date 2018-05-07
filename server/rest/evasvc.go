@@ -19,6 +19,7 @@ import (
 	"eva"
 	"eva/agent"
 	"eva/manager/memory"
+	"eva/manager/sql"
 	"eva/mock"
 	"eva/policy"
 	"eva/utils"
@@ -46,16 +47,25 @@ func iamInit() {
 	hostname, _ = os.Hostname()
 
 	warden = &eva.Eva00{
-		Manager: memoryInit(),
+		Manager: sqlInit(),
 	}
 
-	for _, pol := range mock.Policies {
+	//for _, pol := range mock.Policies {
+	//	warden.Manager.Create(pol)
+	//}
+	pa := agent.NewPolAgent(mock.Jps)
+	a, _ := pa.NormalizePolicies()
+	for _, pol := range a {
 		warden.Manager.Create(pol)
 	}
 }
 
 func memoryInit() *memory.MemoryManager {
 	return memory.NewMemoryManager()
+}
+
+func sqlInit() *sql.SQLManager {
+	return sql.NewSQLManager()
 }
 
 func auth(c *gin.Context) {
@@ -68,12 +78,12 @@ func auth(c *gin.Context) {
 
 			case utils.ErrorWithContext:
 				c.JSON(e.Code(), gin.H{
-					"type": e.Causer(),
-					"status": e.Error(),
-					"source": e.Source(),
+					"type":    e.Causer(),
+					"status":  e.Error(),
+					"source":  e.Source(),
 					"decider": e.Decider(),
-					"from": hostname,
-					})
+					"from":    hostname,
+				})
 			default:
 				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			}

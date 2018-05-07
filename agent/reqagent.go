@@ -21,7 +21,7 @@ import (
 
 // Binding from JSON
 type AuthRequestInput struct {
-	// Subject is the Query keys that is requesting access.
+	// Subject is the query keys describing who is requesting access.
 	// Support both string and []string.
 	Subject interface{} `json:"subject" binding:"required"`
 
@@ -69,11 +69,9 @@ func NewReqAgent() *ReqAgent {
 	return &ReqAgent{}
 }
 
-func (ra *ReqAgent) NormalizeRequests() ([]string, []*RequestContext, error) {
-	keys, err := utils.ItoS(ra.RequestInput.Subject)
-	if err != nil {
-		return nil, nil, err
-	}
+func (ra ReqAgent) NormalizeRequests() ([]string, []*RequestContext, error) {
+	keys := utils.ItoS(ra.RequestInput.Subject)
+
 	var rcs []*RequestContext = nil
 	for _, v := range ra.RequestInput.Payload {
 		request := &RequestContext{
@@ -86,6 +84,6 @@ func (ra *ReqAgent) NormalizeRequests() ([]string, []*RequestContext, error) {
 	return keys, rcs, nil
 }
 
-func (ra *ReqAgent) Payload() interface{} {
+func (ra ReqAgent) Payload() interface{} {
 	return &ra.RequestInput
 }

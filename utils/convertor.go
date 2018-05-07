@@ -16,13 +16,16 @@
 package utils
 
 import (
-	"errors"
 	"fmt"
 )
 
 // ItoS transfer the value from interface{} to string slice.
-func ItoS(i interface{}) ([]string, error) {
+func ItoS(i interface{}) ([]string) {
 	var s []string = nil
+
+	if i == nil {
+		return s
+	}
 
 	switch v := i.(type) {
 	case string:
@@ -32,8 +35,8 @@ func ItoS(i interface{}) ([]string, error) {
 			s = append(s, fmt.Sprintf("%v", u))
 		}
 	default:
-		return s, errors.New("transfer failed, unsupported type")
+		return s
 	}
 
-	return s, nil
+	return s
 }

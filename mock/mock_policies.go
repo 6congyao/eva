@@ -55,9 +55,9 @@ var Policies = []policy.Policy{
 			},
 			{
 				//Principals: []string{"*"},
-				Effect:     policy.DenyAccess,
-				Actions:    []string{"qstor:Put*"},
-				Resources:  []string{"qrn:qcs:qstor:::bar/*"},
+				Effect:    policy.DenyAccess,
+				Actions:   []string{"qstor:Put*"},
+				Resources: []string{"qrn:qcs:qstor:::bar/*"},
 			},
 		},
 	},
@@ -112,10 +112,55 @@ var Policies = []policy.Policy{
 		Statements: []policy.DefaultStatement{
 			{
 				//Principals: []string{"*"},
-				Effect:     policy.AllowAccess,
-				Actions:    []string{"ec2:describe*", "ec2:RunInstances"},
-				Resources:  []string{"*"},
+				Effect:    policy.AllowAccess,
+				Actions:   []string{"ec2:describe*", "ec2:RunInstances"},
+				Resources: []string{"*"},
 			},
 		},
 	},
+}
+
+// A bunch of exemplary json text
+var Jps = []string{
+	`{
+		"Description": "This policy was created for ec2 & s3 service",
+		"Version": "2018-4-18",
+		"statement": [
+			{
+				"effect": "allow",
+				"action": [
+					"ec2:RunInstances",
+					"ec2:DescribeInstances"
+				],
+				"resource": "*"
+			},
+			{
+				"effect": "allow",
+				"action": "s3:GetObject",
+				"resource": [
+					"qrn:qws:s3:::max/*",
+					"qrn:qws:s3:::min/*"
+				]
+			}
+		]
+	}`,
+	`{
+		"Description": "This policy was created for iam service",
+		"Version": "2018-4-18",
+		"statement": [
+			{
+				"effect": "allow",
+				"action": [
+					"iam:CreatePolicy",
+					"iam:DeletePolicy"
+				],
+				"resource": "*"
+			},
+			{
+				"effect": "allow",
+				"action": "iam:CreateRole",
+				"resource": "*"
+			}
+		]
+	}`,
 }
