@@ -1,2 +1,111 @@
 # Eva
+Policy-based evaluation service.
 <h1 align="center"><img src="./docs/images/eva_design.png"></h1>
+
+## Request Context
+Request context example:
+```json
+{
+  "id": "123",
+  "subject": ["user:max", "user:min/project1"],
+  "payload": [
+    {
+      "action": "k8s:list",
+      "resource": "k8s:pods"
+    },
+    {
+      "action": "k8s:watch",
+      "resource": "k8s:pods/log"
+    }
+  ]
+}
+```
+
+## Policy
+Policy example:
+```json
+{
+  "Description": "This policy was created for ec2 & s3 service",
+  "Version": "2018-5-3",
+  "statement": [
+    {
+      "effect": "allow",
+      "action": [
+        "ec2:RunInstances",
+        "ec2:DescribeInstances"
+      ],
+      "resource": "*"
+    },
+    {
+      "effect": "allow",
+      "action": "s3:GetObject",
+      "resource": [
+        "qrn:qws:s3:::max/*",
+        "qrn:qws:s3:::min/*"
+      ]
+    }
+  ]
+}
+```
+
+## Response
+Response example:
+
+Allow(Http 200):
+```json
+{
+  "from": "Lucas-mbp.local",
+  "status": "Allow"
+}
+```
+
+Default Deny(Http 403):
+```json
+{
+  "decider": null,
+  "from": "Lucas-mbp.local",
+  "source": {
+    "action": "k8s:list",
+    "resource": "k8s:podss"
+  },
+  "status": "request was denied by default (no matching statements)",
+  "type": "Default"
+}
+```
+
+Explicit Deny(Http 403):
+```json
+{
+  "decider": {
+    "version": "2018-4-19",
+    "description": "This policy denies entity to perform api get* on qstor service at path /bar/*.",
+    "statement": [
+      {
+        "effect": "allow",
+        "action": [
+          "qstor:Get*"
+        ],
+        "resource": [
+          "qrn:qcs:qstor:::bar/*"
+        ]
+      },
+      {
+        "effect": "deny",
+        "action": [
+          "qstor:Put*"
+        ],
+        "resource": [
+          "qrn:qcs:qstor:::bar/*"
+        ]
+      }
+    ]
+  },
+  "from": "Lucas-mbp.local",
+  "source": {
+    "action": "qstor:Put",
+    "resource": "qrn:qcs:qstor:::bar/2"
+  },
+  "status": "request was explicitly denied",
+  "type": "Explicit"
+}
+```

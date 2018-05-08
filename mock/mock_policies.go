@@ -124,7 +124,7 @@ var Policies = []policy.Policy{
 var Jps = []string{
 	`{
 		"Description": "This policy was created for ec2 & s3 service",
-		"Version": "2018-4-18",
+		"Version": "2018-5-3",
 		"statement": [
 			{
 				"effect": "allow",
@@ -146,7 +146,7 @@ var Jps = []string{
 	}`,
 	`{
 		"Description": "This policy was created for iam service",
-		"Version": "2018-4-18",
+		"Version": "2018-5-4",
 		"statement": [
 			{
 				"effect": "allow",
@@ -160,6 +160,28 @@ var Jps = []string{
 				"effect": "allow",
 				"action": "iam:CreateRole",
 				"resource": "*"
+			}
+		]
+	}`,
+	`{
+		"Description": "This policy was created for k8s",
+		"Version": "2018-5-5",
+		"statement": [
+			{
+				"effect": "allow",
+				"action": [
+					"k8s:list",
+					"k8s:get"
+				],
+				"resource": "k8s:pods"
+			},
+			{
+				"effect": "allow",
+				"action": "k8s:watch",
+				"resource": [
+					"k8s:pods",
+					"k8s:pods/log"
+				]
 			}
 		]
 	}`,

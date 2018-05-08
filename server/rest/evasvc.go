@@ -26,6 +26,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
+
+	"fmt"
 )
 
 var hostname string
@@ -54,7 +56,10 @@ func iamInit() {
 	//	warden.Manager.Create(pol)
 	//}
 	pa := agent.NewPolAgent(mock.Jps)
-	a, _ := pa.NormalizePolicies()
+	a, err := pa.NormalizePolicies()
+	if err != nil {
+		fmt.Println(err)
+	}
 	for _, pol := range a {
 		warden.Manager.Create(pol)
 	}
@@ -71,7 +76,7 @@ func sqlInit() *sql.SQLManager {
 func auth(c *gin.Context) {
 	rag := agent.NewReqAgent()
 	if err := c.ShouldBindJSON(rag.Payload()); err == nil {
-		keys, rcs, _ := rag.NormalizeRequests()
+		keys, rcs := rag.NormalizeRequests()
 		err := warden.Authorize(rcs, keys)
 		if err != nil {
 			switch e := err.(type) {

@@ -69,7 +69,7 @@ func NewReqAgent() *ReqAgent {
 	return &ReqAgent{}
 }
 
-func (ra ReqAgent) NormalizeRequests() ([]string, []*RequestContext, error) {
+func (ra ReqAgent) NormalizeRequests() ([]string, []*RequestContext) {
 	keys := utils.ItoS(ra.RequestInput.Subject)
 
 	var rcs []*RequestContext = nil
@@ -81,9 +81,9 @@ func (ra ReqAgent) NormalizeRequests() ([]string, []*RequestContext, error) {
 		}
 		rcs = append(rcs, request)
 	}
-	return keys, rcs, nil
+	return keys, rcs
 }
 
-func (ra ReqAgent) Payload() interface{} {
+func (ra *ReqAgent) Payload() interface{} {
 	return &ra.RequestInput
 }
