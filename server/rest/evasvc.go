@@ -69,8 +69,8 @@ func memoryInit() *memory.MemoryManager {
 	return memory.NewMemoryManager()
 }
 
-func sqlInit() *sql.SQLManager {
-	return sql.NewSQLManager()
+func sqlInit() *sql.PgSqlManager {
+	return sql.NewPgSqlManager()
 }
 
 func auth(c *gin.Context) {

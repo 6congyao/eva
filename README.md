@@ -7,7 +7,7 @@ Request context example:
 ```json
 {
   "id": "123",
-  "subject": ["user:max", "user:min/project1"],
+  "subject": ["qrn:user/max", "qrn:user/project1/min"],
   "payload": [
     {
       "action": "k8s:list",

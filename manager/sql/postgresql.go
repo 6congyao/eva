@@ -17,79 +17,52 @@ package sql
 
 import (
 	"eva/policy"
-	"sync"
 )
 
 // SQLManager is a postgres implementation for Manager to store policies persistently.
-type SQLManager struct {
-	Policies map[string]policy.Policies
-	sync.RWMutex
+type PgSqlManager struct {
+	dbstr string
 }
 
 // NewSQLManager initializes a new SQLManager for given db instance.
-func NewSQLManager() *SQLManager {
-	return &SQLManager{
-		Policies: map[string]policy.Policies{},
-	}
-}
-
-// Create a new policy to SQLManager.
-func (m *SQLManager) Create(policy policy.Policy) error {
-	m.Lock()
-	defer m.Unlock()
-
-	m.Policies[policy.GetID()] = append(m.Policies[policy.GetID()], policy)
+func NewPgSqlManager() *PgSqlManager {
 
 	return nil
 }
 
-func (m *SQLManager) FindCandidates(keys []string) (policy.Policies, error) {
-	m.RLock()
-	defer m.RUnlock()
-	var ps policy.Policies
-	for _, key := range keys {
-		if v, found := m.Policies[key]; found {
-			ps = append(ps, v...)
-		}
-	}
+// Create a new policy to SQLManager.
+func (m *PgSqlManager) Create(policy policy.Policy) error {
 
-	return ps, nil
+	return nil
+}
+
+func (m *PgSqlManager) FindCandidates(keys []string) (policy.Policies, error) {
+
+
+	return nil, nil
 }
 
 // Get retrieves a policy.
-func (m *SQLManager) Get(id string) (policy.Policy, error) {
-	m.RLock()
-	defer m.RUnlock()
+func (m *PgSqlManager) Get(id string) (policy.Policy, error) {
 
 	return nil, nil
 }
 
 // Delete removes a policy.
-func (m *SQLManager) Delete(id string) error {
-	m.Lock()
-	defer m.Unlock()
-	delete(m.Policies, id)
+func (m *PgSqlManager) Delete(id string) error {
+
 	return nil
 }
 
 // Update updates an existing policy.
-func (m *SQLManager) Update(policy policy.Policy) error {
-	m.Lock()
-	defer m.Unlock()
-	m.Policies[policy.GetID()] = nil
+func (m *PgSqlManager) Update(policy policy.Policy) error {
+
 	return nil
 }
 
 // GetAll returns all policies.
-func (m *SQLManager) GetAll(limit, offset int64) (policy.Policies, error) {
-	ps := policy.Policies{}
+func (m *PgSqlManager) GetAll(limit, offset int64) (policy.Policies, error) {
 
-	for _, mp := range m.Policies {
-		for _, p := range mp {
-			ps = append(ps, p)
-		}
-	}
-
-	return ps, nil
+	return nil, nil
 }
 
