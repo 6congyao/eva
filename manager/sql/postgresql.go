@@ -17,27 +17,45 @@ package sql
 
 import (
 	"eva/policy"
+	"github.com/jmoiron/sqlx"
 )
 
-// SQLManager is a postgres implementation for Manager to store policies persistently.
+// PgSqlManager is a postgres implementation for Manager to fetch policies persistently.
 type PgSqlManager struct {
-	dbstr string
+	db       *sqlx.DB
 }
 
-// NewSQLManager initializes a new SQLManager for given db instance.
-func NewPgSqlManager() *PgSqlManager {
-
-	return nil
+// NewPgSqlManager initializes a new SQLManager for given db instance.
+func NewPgSqlManager(db *sqlx.DB) *PgSqlManager {
+	return &PgSqlManager{
+		db:       db,
+	}
 }
 
 // Create a new policy to SQLManager.
 func (m *PgSqlManager) Create(policy policy.Policy) error {
+	//tx, err := m.db.Beginx()
+	//
+	//if err != nil {
+	//	return err
+	//}
+	//
+	//
+	//if err = tx.Commit(); err != nil {
+	//	return err
+	//}
+	//tx := m.db.MustBegin()
+	//
+	//for _, v := range policies {
+	//	tx.MustExec("INSERT INTO iam_policy (statement) VALUES ($1)", v)
+	//}
+	//
+	//tx.Commit()
 
 	return nil
 }
 
 func (m *PgSqlManager) FindCandidates(keys []string) (policy.Policies, error) {
-
 
 	return nil, nil
 }
@@ -65,4 +83,3 @@ func (m *PgSqlManager) GetAll(limit, offset int64) (policy.Policies, error) {
 
 	return nil, nil
 }
-

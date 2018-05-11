@@ -20,14 +20,16 @@ import (
 	"eva/agent"
 	"eva/manager/memory"
 	"eva/manager/sql"
-	"eva/mock"
+
 	"eva/policy"
 	"eva/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
 
-	"fmt"
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
+	"log"
 )
 
 var hostname string
@@ -55,14 +57,15 @@ func iamInit() {
 	//for _, pol := range mock.Policies {
 	//	warden.Manager.Create(pol)
 	//}
-	pa := agent.NewPolAgent(mock.Jps)
-	a, err := pa.NormalizePolicies()
-	if err != nil {
-		fmt.Println(err)
-	}
-	for _, pol := range a {
-		warden.Manager.Create(pol)
-	}
+
+	//pa := agent.NewPolAgent(mock.Jps)
+	//a, err := pa.NormalizePolicies()
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//for _, pol := range a {
+	//	warden.Manager.Create(pol)
+	//}
 }
 
 func memoryInit() *memory.MemoryManager {
@@ -70,7 +73,17 @@ func memoryInit() *memory.MemoryManager {
 }
 
 func sqlInit() *sql.PgSqlManager {
-	return sql.NewPgSqlManager()
+	db, err := sqlx.Open("postgres", "postgres://postgres:root@139.198.177.115:5432/iam?sslmode=disable")
+
+	if err != nil {
+		log.Fatalf("Could not connect to database: %s", err)
+	}
+
+	//createTables(db)
+	//insertPolicies(db, mock.Jps)
+	//insertBindings(db, mock.Jps)
+
+	return sql.NewPgSqlManager(db)
 }
 
 func auth(c *gin.Context) {
@@ -125,4 +138,28 @@ func createPolicy(c *gin.Context) {
 
 func greeting(c *gin.Context) {
 	c.String(http.StatusOK, "Greetings! This is from %s \n", hostname)
+}
+
+func createTables(db *sqlx.DB) {
+	db.MustExec(sql.Schema)
+}
+
+func insertPolicies(db *sqlx.DB, policies []string) {
+	tx := db.MustBegin()
+
+	for _, v := range policies {
+		tx.MustExec("INSERT INTO iam_policy (statement) VALUES ($1)", v)
+	}
+
+	tx.Commit()
+}
+
+func insertBindings(db *sqlx.DB, policies []string) {
+	tx := db.MustBegin()
+
+	for i, _ := range policies {
+		tx.MustExec("INSERT INTO policy_binding (entity_qrn, policy_id) VALUES ($1, $2)", "qrn:user/max", i+1)
+	}
+
+	tx.Commit()
 }
