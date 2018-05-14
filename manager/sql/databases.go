@@ -25,12 +25,22 @@ CREATE TABLE IF NOT EXISTS iam_policy (
 CREATE TABLE IF NOT EXISTS policy_binding (
     entity_qrn text NOT NULL,
 	policy_id integer NOT NULL,
-	create_time timestamp default now()
+	created_time timestamp default now()
 )`
 
-var Find = `
-SELECT statement FROM iam_policy
-INNER JOIN policy_binding
-ON id = policy_id
-WHERE entity_qrn = 'qrn:user/openpitrix/max'
-`
+var findCandidatesQuery = `SELECT 
+		id, statement, entity_qrn
+	FROM 
+		iam_policy
+	INNER JOIN 
+		policy_binding
+	ON 
+		id = policy_id
+	WHERE 
+		entity_qrn 
+	IN (?)`
+
+var getAllQuery = `SELECT
+		id, statement
+	FROM
+		iam_policy ORDER BY id LIMIT ? OFFSET ?`

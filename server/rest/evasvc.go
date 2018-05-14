@@ -30,6 +30,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"log"
+	//"eva/mock"
 )
 
 var hostname string
@@ -158,7 +159,7 @@ func insertBindings(db *sqlx.DB, policies []string) {
 	tx := db.MustBegin()
 
 	for i, _ := range policies {
-		tx.MustExec("INSERT INTO policy_binding (entity_qrn, policy_id) VALUES ($1, $2)", "qrn:user/max", i+1)
+		tx.MustExec("INSERT INTO policy_binding (entity_qrn, policy_id) VALUES ($1, $2)", "qrn:user/op/max", i+1)
 	}
 
 	tx.Commit()

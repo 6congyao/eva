@@ -16,23 +16,31 @@
 package sql
 
 import (
+	"eva/agent"
 	"eva/policy"
 	"github.com/jmoiron/sqlx"
+	"github.com/jmoiron/sqlx/types"
 )
+
+type dbPolicy struct {
+	Id        int            `db:"id"`
+	Key       string         `db:"entity_qrn"`
+	Statement types.JSONText `db:"statement"`
+}
 
 // PgSqlManager is a postgres implementation for Manager to fetch policies persistently.
 type PgSqlManager struct {
-	db       *sqlx.DB
+	db *sqlx.DB
 }
 
 // NewPgSqlManager initializes a new SQLManager for given db instance.
 func NewPgSqlManager(db *sqlx.DB) *PgSqlManager {
 	return &PgSqlManager{
-		db:       db,
+		db: db,
 	}
 }
 
-// Create a new policy to SQLManager.
+// Create a new policy to NewPgSqlManager.
 func (m *PgSqlManager) Create(policy policy.Policy) error {
 	//tx, err := m.db.Beginx()
 	//
@@ -56,8 +64,18 @@ func (m *PgSqlManager) Create(policy policy.Policy) error {
 }
 
 func (m *PgSqlManager) FindCandidates(keys []string) (policy.Policies, error) {
+	query, args, err := sqlx.In(findCandidatesQuery, keys)
+	if err != nil {
+		return nil, err
+	}
+	query = m.db.Rebind(query)
+	rows, err := m.db.Queryx(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
 
-	return nil, nil
+	return scanRows(rows)
 }
 
 // Get retrieves a policy.
@@ -80,6 +98,32 @@ func (m *PgSqlManager) Update(policy policy.Policy) error {
 
 // GetAll returns all policies.
 func (m *PgSqlManager) GetAll(limit, offset int64) (policy.Policies, error) {
+	query := m.db.Rebind(getAllQuery)
 
-	return nil, nil
+	rows, err := m.db.Queryx(query, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	return scanRows(rows)
+}
+
+func scanRows(rows *sqlx.Rows) (policy.Policies, error) {
+	var ps []string = nil
+
+	for rows.Next() {
+		var dp dbPolicy
+
+		rows.StructScan(&dp)
+		ps = append(ps, string(dp.Statement[:]))
+
+		if len(dp.Key) > 1 {
+//todo: cache
+		}
+	}
+
+	pa := agent.NewPolAgent(ps)
+
+	return pa.NormalizePolicies()
 }
