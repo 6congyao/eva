@@ -40,14 +40,14 @@ type StatementInput struct {
 }
 
 type PolAgent struct {
-	Policies []string
+	Policies [][]byte
 }
 
-func NewPolAgent(ps []string) *PolAgent {
+func NewPolAgent(ps [][]byte) *PolAgent {
 	if ps != nil {
 		return &PolAgent{Policies: ps}
 	}
-	return &PolAgent{Policies: []string{}}
+	return &PolAgent{Policies: [][]byte{}}
 }
 
 func (pa PolAgent) NormalizePolicies() (policy.Policies, error) {
@@ -55,7 +55,7 @@ func (pa PolAgent) NormalizePolicies() (policy.Policies, error) {
 
 	for _, p := range pa.Policies {
 		pi := &PolicyInput{}
-		if err := json.Unmarshal([]byte(p), pi); err != nil {
+		if err := json.Unmarshal(p, pi); err != nil {
 			return nil, err
 		}
 
@@ -72,13 +72,13 @@ func (pa PolAgent) NormalizePolicies() (policy.Policies, error) {
 			statements = append(statements, *statement)
 		}
 
-		policy := &policy.DefaultPolicy{
+		dp := &policy.DefaultPolicy{
 			Version:     pi.Version,
 			Description: pi.Description,
 			Statements:  statements,
 		}
 
-		policies = append(policies, policy)
+		policies = append(policies, dp)
 	}
 
 	return policies, nil

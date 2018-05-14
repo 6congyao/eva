@@ -110,13 +110,13 @@ func (m *PgSqlManager) GetAll(limit, offset int64) (policy.Policies, error) {
 }
 
 func scanRows(rows *sqlx.Rows) (policy.Policies, error) {
-	var ps []string = nil
+	var ps [][]byte = nil
 
 	for rows.Next() {
 		var dp dbPolicy
 
 		rows.StructScan(&dp)
-		ps = append(ps, string(dp.Statement[:]))
+		ps = append(ps, dp.Statement)
 
 		if len(dp.Key) > 1 {
 //todo: cache
