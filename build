@@ -7,4 +7,4 @@ mkdir -p bin
 
 go get -u github.com/gin-gonic/gin github.com/lib/pq github.com/jmoiron/sqlx
 
-go build -o $OUTPUT .
+go build -o $OUTPUT server/rest/evasvc.go
