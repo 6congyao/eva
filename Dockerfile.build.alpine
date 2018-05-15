@@ -4,7 +4,7 @@ ENV GOPATH /go
 RUN apk --update add bash git curl
 
 RUN mkdir -p "$GOPATH/src/" "$GOPATH/bin" && chmod -R 777 "$GOPATH" && \
-    mkdir -p /go/src/github.com/6congyao/eva && \
-    ln -s /go/src/github.com/6congyao/eva /app
+    mkdir -p /go/src/eva && \
+    ln -s /go/src/eva /app
 
 WORKDIR /app
