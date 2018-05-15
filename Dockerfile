@@ -1,4 +1,4 @@
-FROM alpine:3.7
+FROM alpine:3.6
 MAINTAINER Lucas <6congyao@gmail.com>
 
 RUN apk add --no-cache bash ca-certificates wget
