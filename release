@@ -1,19 +1,9 @@
 #!/usr/bin/env bash
 
-echo "Release linux version ..."
-mkdir -p bin/linux
-env GOOS=linux GOARCH=amd64 go build -o bin/linux/eva .
-tar -C bin/linux/ -czf bin/linux/eva-linux-amd64.tar.gz eva
-
-echo "Release darwin version ..."
-mkdir -p bin/darwin
-env GOOS=darwin GOARCH=amd64 go build -o bin/darwin/eva .
-tar -C bin/darwin/ -czf bin/darwin/eva-darwin-amd64.tar.gz eva
-
 echo "Release alpine version ..."
 mkdir -p bin/alpine
 docker build -t go_alpine_builder -f Dockerfile.build.alpine .
-docker run -ti --rm -v $(pwd):/app go_alpine_builder ./build bin/alpine/eva
-tar -C bin/alpine/ -czf bin/alpine/eva-alpine-amd64.tar.gz eva
+docker run -ti --rm -v $(pwd):/app go_alpine_builder ./build bin/alpine/evasvc
+tar -C bin/alpine/ -czf bin/alpine/evasvc-alpine-amd64.tar.gz evasvc
 
 ls -lh bin/*
