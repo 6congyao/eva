@@ -74,7 +74,9 @@ func memoryInit() *memory.MemoryManager {
 }
 
 func sqlInit() *sql.PgSqlManager {
-	db, err := sqlx.Open("postgres", "postgres://postgres:root@139.198.177.115:5432/iam?sslmode=disable")
+	dbDrv := os.Getenv(eva.EnvDBDriver)
+	dbSrc := os.Getenv(eva.EnvDBSource)
+	db, err := sqlx.Open(dbDrv, dbSrc)
 
 	if err != nil {
 		log.Fatalf("Could not connect to database: %s", err)

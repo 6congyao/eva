@@ -1,0 +1,21 @@
+sudo: required
+language: go
+services:
+- docker
+go:
+- 1.10.2
+before_install:
+- chmod +x release
+- chmod +x build
+install:
+- go get -u github.com/gin-gonic/gin github.com/lib/pq
+- curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+- dep ensure
+- go build . && ./release
+script:
+- docker build --rm -t 6congyao/eva .
+after_success:
+- if [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+  docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+  docker push 6congyao/eva;
+  fi

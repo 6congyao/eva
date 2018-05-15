@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+OUTPUT=${1:-bin/eva}
+
+echo "Building eva ..."
+mkdir -p bin
+
+go get -u github.com/gin-gonic/gin github.com/lib/pq
+curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+dep ensure
+
+go build -o $OUTPUT .

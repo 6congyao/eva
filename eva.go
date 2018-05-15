@@ -16,11 +16,16 @@
 package eva
 
 import (
+	"eva/agent"
 	"eva/manager"
 	"eva/matcher"
 	"eva/policy"
 	"eva/utils"
-	"eva/agent"
+)
+
+const (
+	EnvDBDriver = "EVA_DB_DRIVER"
+	EnvDBSource = "EVA_DB_SOURCE"
 )
 
 // Eva is responsible for deciding if principal p can perform action a on resource r with condition c.
