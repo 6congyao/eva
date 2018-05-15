@@ -6,8 +6,6 @@ RUN wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://raw.githubusercontent.com/
 RUN wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.27-r0/glibc-2.27-r0.apk
 RUN apk add glibc-2.27-r0.apk
 
-ADD evasvc /bin/
-
 ENV EVA_DB_DRIVER postgres
 ENV EVA_DB_SOURCE postgres://postgres:root@139.198.177.115:5432/iam?sslmode=disable
 

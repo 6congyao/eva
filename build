@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 
-OUTPUT=${1:-bin/eva}
-
+OUTPUT=${1:-bin/evasvc}
 echo "Building eva ..."
 mkdir -p bin
 
 go get -u github.com/gin-gonic/gin github.com/lib/pq github.com/jmoiron/sqlx
-
 go build -o $OUTPUT server/rest/evasvc.go

@@ -9,8 +9,7 @@ before_install:
 - chmod +x release
 - chmod +x build
 install:
-- go get -u github.com/gin-gonic/gin github.com/lib/pq github.com/jmoiron/sqlx
-- go build server/rest/evasvc.go && ./release
+- ./release
 script:
 - docker build --rm -t 6congyao/eva .
 after_success:
