@@ -23,8 +23,8 @@ import (
 )
 
 type dbPolicy struct {
-	Id        int            `db:"id"`
-	Key       string         `db:"entity_qrn"`
+	Id        string         `db:"policy_id"`
+	Key       string         `db:"entity_urn"`
 	Statement types.JSONText `db:"statement"`
 }
 
@@ -114,13 +114,15 @@ func scanRows(rows *sqlx.Rows) (policy.Policies, error) {
 
 	for rows.Next() {
 		var dp dbPolicy
+		if err := rows.StructScan(&dp); err != nil {
+			return nil, err
+		}
 
-		rows.StructScan(&dp)
 		ps = append(ps, dp.Statement)
 
-		if len(dp.Key) > 1 {
-//todo: cache
-		}
+		//		if len(dp.Key) > 1 {
+		////todo: cache
+		//		}
 	}
 
 	pa := agent.NewPolAgent(ps)

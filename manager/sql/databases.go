@@ -17,30 +17,51 @@ package sql
 
 var Schema = `
 CREATE TABLE IF NOT EXISTS iam_policy (
-    id SERIAL,
-    statement json NOT NULL,
-    created_time timestamp default now()
+  policy_id    VARCHAR(50)                                  NOT NULL
+    CONSTRAINT iam_policy_pkey
+    PRIMARY KEY,
+  policy_name  VARCHAR(255) DEFAULT '' :: CHARACTER VARYING NOT NULL,
+  description  TEXT,
+  qrn          VARCHAR(255)                                 NOT NULL,
+  path         VARCHAR(255) DEFAULT '' :: CHARACTER VARYING NOT NULL,
+  statement    TEXT                                         NOT NULL,
+  version      VARCHAR(255)                                 NOT NULL,
+  create_time  TIMESTAMP DEFAULT now()                      NOT NULL,
+  root_user_id VARCHAR(255) DEFAULT '' :: CHARACTER VARYING NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS policy_binding (
-    entity_qrn text NOT NULL,
-	policy_id integer NOT NULL,
-	created_time timestamp default now()
-)`
+  resource_id     VARCHAR(50)                                 NOT NULL,
+  entity_urn      VARCHAR(255)                                NOT NULL,
+  binding_context VARCHAR(255)                                NOT NULL,
+  policy_id       VARCHAR(255)                                NOT NULL,
+  resource_type   VARCHAR(50) DEFAULT '' :: CHARACTER VARYING NOT NULL,
+  CONSTRAINT policy_binding_pkey
+  PRIMARY KEY (policy_id, entity_urn)
+);
+
+CREATE INDEX policy_binding_resource_id
+  ON policy_binding (resource_id);
+
+CREATE INDEX policy_binding_entity_urn
+  ON policy_binding (entity_urn);
+
+CREATE INDEX policy_binding_policy_id
+  ON policy_binding (policy_id);`
 
 var findCandidatesQuery = `SELECT 
-		id, statement, entity_qrn
+		p.policy_id, statement, entity_urn
 	FROM 
-		iam_policy
+		iam_policy AS p
 	INNER JOIN 
-		policy_binding
+		policy_binding AS b
 	ON 
-		id = policy_id
+		p.policy_id = b.policy_id
 	WHERE 
-		entity_qrn 
+		entity_urn 
 	IN (?)`
 
 var getAllQuery = `SELECT
-		id, statement
+		policy_id, statement
 	FROM
-		iam_policy ORDER BY id LIMIT ? OFFSET ?`
+		iam_policy LIMIT ? OFFSET ?`
