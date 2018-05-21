@@ -99,7 +99,7 @@ func auth(c *gin.Context) {
 			switch e := err.(type) {
 
 			case utils.ErrorWithContext:
-				fmt.Fprintf(os.Stdout, "[EVA] ReqID: %s | Status: Deny | Type: %s | Source: %s | Decider: %s \n",
+				fmt.Fprintf(os.Stdout, "[EVA] ReqID: %s | Status: Deny | Type: %s | Source: %#v | Decider: %#v \n",
 					rag.RequestInput.Id, e.Causer(), e.Source(), e.Decider())
 				c.JSON(e.Code(), gin.H{
 					"type":    e.Causer(),
