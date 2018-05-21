@@ -29,7 +29,7 @@ type AuthRequestInput struct {
 	// MUST be [].
 	Payload []AuthRequestPayload `json:"payload" binding:"required"`
 
-	Id string `json:"id" binding:"required"`
+	Id string `json:"id"`
 }
 
 // Binding from JSON

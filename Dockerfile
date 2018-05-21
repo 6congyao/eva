@@ -9,7 +9,6 @@ RUN apk add glibc-2.27-r0.apk
 ADD bin/alpine/evasvc /bin/
 
 ENV EVA_DB_DRIVER postgres
-ENV EVA_DB_SOURCE postgres://postgres:root@139.198.177.115:5432/iam?sslmode=disable
 
 EXPOSE 8080
 

@@ -27,10 +27,10 @@ import (
 	"net/http"
 	"os"
 
+	"fmt"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"log"
-	//"eva/mock"
 )
 
 var hostname string
@@ -76,7 +76,8 @@ func memoryInit() *memory.MemoryManager {
 func sqlInit() *sql.PgSqlManager {
 	dbDrv := os.Getenv(eva.EnvDBDriver)
 	dbSrc := os.Getenv(eva.EnvDBSource)
-	db, err := sqlx.Open(dbDrv, dbSrc)
+
+	db, err := sqlx.Connect(dbDrv, dbSrc)
 
 	if err != nil {
 		log.Fatalf("Could not connect to database: %s", err)
@@ -98,6 +99,8 @@ func auth(c *gin.Context) {
 			switch e := err.(type) {
 
 			case utils.ErrorWithContext:
+				fmt.Fprintf(os.Stdout, "[EVA] ReqID: %s | Status: Deny | Type: %s | Source: %s | Decider: %s \n",
+					rag.RequestInput.Id, e.Causer(), e.Source(), e.Decider())
 				c.JSON(e.Code(), gin.H{
 					"type":    e.Causer(),
 					"status":  e.Error(),
@@ -106,14 +109,17 @@ func auth(c *gin.Context) {
 					"from":    hostname,
 				})
 			default:
+				fmt.Fprintf(os.Stdout, "[EVA] ReqID: %s | Status: Deny | Error: %s \n", rag.RequestInput.Id, err.Error())
 				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			}
 
 		} else {
+			fmt.Fprintf(os.Stdout, "[EVA] ReqID: %s | Status: Allow | From: %s \n", rag.RequestInput.Id, hostname)
 			c.JSON(http.StatusOK, gin.H{"status": "Allow", "from": hostname})
 		}
 
 	} else {
+		fmt.Fprintf(os.Stdout, "[EVA] ReqID: %s | Status: Deny | Error: %s \n", rag.RequestInput.Id, err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
 }
