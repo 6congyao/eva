@@ -4,12 +4,14 @@ Policy-based evaluation service.
 <h1 align="center"><img src="./docs/images/eva_design.png"></h1>
 
 ## API
-###/evaluation
+### /evaluation
+
 Http method: Post
 
 Http body: [Request Context](#req-ctx)
 
-###/healthy
+### /healthy
+
 Http method: Get
 
 ## <a name="req-ctx">Request Context
