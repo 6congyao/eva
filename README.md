@@ -3,12 +3,21 @@ Policy-based evaluation service.
 [![Build Status](https://travis-ci.org/6congyao/eva.svg?branch=master)](https://travis-ci.org/6congyao/eva)
 <h1 align="center"><img src="./docs/images/eva_design.png"></h1>
 
-## Request Context
+## API
+###/evaluation
+Http method: Post
+
+Http body: [Request Context](#req-ctx)
+
+###/healthy
+Http method: Get
+
+## <a name="req-ctx">Request Context
 Request context example:
 ```json
 {
   "id": "123",
-  "subject": ["qrn:user/max", "qrn:user/project1/min"],
+  "subject": ["qrn:user/max", "qrn:group/dev"],
   "payload": [
     {
       "action": "k8s:list",

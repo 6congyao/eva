@@ -35,16 +35,18 @@ import (
 
 var hostname string
 var warden *eva.Eva00
+var ready = false
 
 func main() {
 	iamInit()
 	router := gin.Default()
 
-	router.GET("/hi", greeting)
+	router.GET("/healthy", healthy)
 	router.POST("/evaluation", auth)
 	router.POST("/policy", createPolicy)
 	router.GET("/policy", getPolicy)
 
+	ready = true
 	router.Run()
 }
 
@@ -145,8 +147,13 @@ func createPolicy(c *gin.Context) {
 	}
 }
 
-func greeting(c *gin.Context) {
-	c.String(http.StatusOK, "Greetings! This is from %s \n", hostname)
+func healthy(c *gin.Context) {
+	if ready == false {
+		c.String(http.StatusServiceUnavailable, "Greetings! This is from %s \n", hostname)
+	} else {
+		c.String(http.StatusOK, "Greetings! This is from %s \n", hostname)
+	}
+
 }
 
 func createTables(db *sqlx.DB) {
@@ -167,7 +174,7 @@ func insertBindings(db *sqlx.DB, policies []string) {
 	tx := db.MustBegin()
 
 	for i, _ := range policies {
-		tx.MustExec("INSERT INTO policy_binding (entity_qrn, policy_id) VALUES ($1, $2)", "qrn:user/op/max", i+1)
+		tx.MustExec("INSERT INTO policy_binding (entity_urn, policy_id) VALUES ($1, $2)", "qrn:user/op/max", i+1)
 	}
 
 	tx.Commit()
