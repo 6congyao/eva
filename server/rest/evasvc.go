@@ -95,7 +95,8 @@ func sqlInit() *sql.PgSqlManager {
 func auth(c *gin.Context) {
 	rag := agent.NewReqAgent()
 	if err := c.ShouldBindJSON(rag.Payload()); err == nil {
-		keys, rcs := rag.NormalizeRequests()
+		keys, rcs, _ := rag.NormalizeRequests()
+
 		err := warden.Authorize(rcs, keys)
 		if err != nil {
 			switch e := err.(type) {

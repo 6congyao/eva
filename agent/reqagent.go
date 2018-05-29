@@ -29,6 +29,11 @@ type AuthRequestInput struct {
 	// MUST be [].
 	Payload []AuthRequestPayload `json:"payload" binding:"required"`
 
+	// Policy is an IAM policy in JSON format.
+	// It is optional. This gives you a way to further restrict the permissions for the evaluation result.
+	// You cannot use the passed policy to grant permissions that are in excess of those allowed by the permissions policy of the role that is being assumed.
+	Policy []byte `json:"policy"`
+
 	Id string `json:"id"`
 }
 
@@ -69,7 +74,9 @@ func NewReqAgent() *ReqAgent {
 	return &ReqAgent{}
 }
 
-func (ra ReqAgent) NormalizeRequests() ([]string, []*RequestContext) {
+// NormalizeRequests helps to process the 'AuthRequestInput'
+// It transferred the Subject to string slice, formatted the Payload to RequestContext slice, and directly return the Policy content.
+func (ra ReqAgent) NormalizeRequests() ([]string, []*RequestContext, []byte) {
 	keys := utils.ItoS(ra.RequestInput.Subject)
 
 	var rcs []*RequestContext = nil
@@ -81,7 +88,8 @@ func (ra ReqAgent) NormalizeRequests() ([]string, []*RequestContext) {
 		}
 		rcs = append(rcs, request)
 	}
-	return keys, rcs
+
+	return keys, rcs, ra.RequestInput.Policy
 }
 
 func (ra *ReqAgent) Payload() interface{} {
