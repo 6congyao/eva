@@ -11,9 +11,9 @@ before_install:
 install:
 - ./release
 script:
-- docker build --rm -t 6congyao/eva .
+- docker build --rm -t kubesphere/eva .
 after_success:
 - if [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
   docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
-  docker push 6congyao/eva;
+  docker push kubesphere/eva;
   fi
