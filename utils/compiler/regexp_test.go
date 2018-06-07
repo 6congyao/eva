@@ -20,7 +20,10 @@ import (
 	"testing"
 )
 
+const checkPass = "\u2713"
+const checkFail = "\u2717"
 func TestRegexCompiler(t *testing.T) {
+//	t.Log("Test Regex Compiler")
 	for k, c := range []struct {
 		template       string
 		delimiterStart byte
@@ -34,7 +37,6 @@ func TestRegexCompiler(t *testing.T) {
 		{"urn:foo.bar.com:{.*}", '{', '}', false, "urn:foo.com:bar:baz", true},
 		{"urn:foo.bar.com:{.*}", '{', '}', false, "foobar", true},
 		{"urn:foo.bar.com:{.{1,2}}", '{', '}', false, "urn:foo.bar.com:aa", false},
-
 		{"urn:foo.bar.com:{.*{}", '{', '}', true, "", true},
 		{"urn:foo:<.*>", '<', '>', false, "urn:foo:bar:baz", false},
 
@@ -44,15 +46,26 @@ func TestRegexCompiler(t *testing.T) {
 		k++
 		result, err := CompileRegex(c.template, c.delimiterStart, c.delimiterEnd)
 		//assert.Equal(t, c.failCompile, err != nil, "Case %d", k)
-		if c.failCompile || err != nil {
-			continue
+		if c.failCompile ==( err != nil) {
+			if !c.failCompile{
+				//if err is not nil,ok will be false
+				ok, _ := regexp.MatchString(result.String(), c.matchAgainst)
+				if ok{
+					//t.Logf("case %d success compiled to %s %s",k,result.String(),checkPass)
+				}
+
+				if ok!=!c.failMatch {
+					t.Errorf("\tError match! case %d template:%s,matchAgainst:%s,failMatch:%t %s",k,c.template,c.matchAgainst,c.failMatch,checkFail)
+				}
+			}else {
+//				t.Logf("case %d fail compiled %s %s",k,c.template,checkPass)
+
+			}
+		}else {
+			t.Errorf("\tError compile! case %d should comile %t,but %t %s",k,c.failCompile,err!=nil,checkFail)
 		}
 
-		t.Logf("Case %d compiled to: %s", k, result.String())
-		ok, err := regexp.MatchString(result.String(), c.matchAgainst)
-		if !ok {
-			t.Fatalf("mismatching")
-		}
+
 		//assert.Nil(t, err, "Case %d", k)
 		//assert.Equal(t, !c.failMatch, ok, "Case %d", k)
 	}
