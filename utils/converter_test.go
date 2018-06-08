@@ -53,8 +53,8 @@ func TestItoS(t *testing.T) {
 		{[]interface{}{4294967297, "-4294967297"}, []string{"4294967297", "-4294967297"}},//pow(2,32)+1
 		{[]interface{}{9294967297, "-4294967297"}, []string{"9294967297", "-4294967297"}},
 		{[]interface{}{1.1, "-0.0"}, []string{"1.1", "-0.0"}},
-		//{[]interface{}{float64(1000000), "-0.0"}, []string{"1000000", "-0.0"}},
-		{[]interface{}{1000000.1, "-0.0"}, []string{"1000000.1", "-0.0"}},//over 10^6 will translate to 1.0000001e+06
+		{[]interface{}{float64(1000000), "-0.0"}, []string{"1000000", "-0.0"}},
+		{[]interface{}{1000000.1, "-0.0"}, []string{"1000000.1", "-0.0"}},//fixed
 
 
 		{"s3:GetObject", []string{"s3:GetObject"}},
