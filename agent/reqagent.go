@@ -77,7 +77,7 @@ func NewReqAgent() *ReqAgent {
 // NormalizeRequests helps to process the 'AuthRequestInput'
 // It transferred the Subject to string slice, formatted the Payload to RequestContext slice, and directly return the Policy content.
 func (ra ReqAgent) NormalizeRequests() ([]string, []*RequestContext, []byte) {
-	keys := utils.ItoS(ra.RequestInput.Subject)
+	keys := utils.ToStringSlice(ra.RequestInput.Subject)
 
 	var rcs []*RequestContext = nil
 	for _, v := range ra.RequestInput.Payload {

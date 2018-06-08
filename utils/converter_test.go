@@ -24,7 +24,7 @@ const checkPass = "\u2713"
 const checkFail = "\u2717"
 
 func TestItoS(t *testing.T) {
-	log.Println("Test ItoS")
+	log.Println("Test ToStringSlice")
 	for k, c := range []struct {
 		input  interface{}
 		output []string
@@ -60,10 +60,10 @@ func TestItoS(t *testing.T) {
 		{"s3:GetObject", []string{"s3:GetObject"}},
 
 	} {
-		if !compare(ItoS(c.input), c.output) {
-			t.Errorf("Error! case %d input:%#v output:%#v correct:%s %s",k+1,c.input, ItoS(c.input), c.output, checkFail)
+		if !compare(ToStringSlice(c.input), c.output) {
+			t.Errorf("Error! case %d input:%#v output:%#v correct:%s %s",k+1,c.input, ToStringSlice(c.input), c.output, checkFail)
 		}else {
-			//t.Logf("PASS! case %d input:%#v output:%#v correct:%s %s",k+1,c.input, ItoS(c.input), c.output, checkPass)
+			//t.Logf("PASS! case %d input:%#v output:%#v correct:%s %s",k+1,c.input, ToStringSlice(c.input), c.output, checkPass)
 		}
 	}
 

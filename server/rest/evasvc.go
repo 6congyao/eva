@@ -38,11 +38,13 @@ var warden *eva.Eva00
 var ready = false
 
 func main() {
-	iamInit()
+	evaInit()
 	router := gin.Default()
 
 	router.GET("/healthy", healthy)
 	router.POST("/evaluation", auth)
+
+	// For testing proposal
 	router.POST("/policy", createPolicy)
 	router.GET("/policy", getPolicy)
 
@@ -50,7 +52,7 @@ func main() {
 	router.Run()
 }
 
-func iamInit() {
+func evaInit() {
 	hostname, _ = os.Hostname()
 
 	warden = &eva.Eva00{
@@ -127,6 +129,15 @@ func auth(c *gin.Context) {
 	}
 }
 
+func healthy(c *gin.Context) {
+	if ready == false {
+		c.String(http.StatusServiceUnavailable, "Greetings! This is from %s \n", hostname)
+	} else {
+		c.String(http.StatusOK, "Greetings! This is from %s \n", hostname)
+	}
+
+}
+
 func getPolicy(c *gin.Context) {
 	policies, err := warden.Manager.GetAll(100, 0)
 
@@ -146,15 +157,6 @@ func createPolicy(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
-}
-
-func healthy(c *gin.Context) {
-	if ready == false {
-		c.String(http.StatusServiceUnavailable, "Greetings! This is from %s \n", hostname)
-	} else {
-		c.String(http.StatusOK, "Greetings! This is from %s \n", hostname)
-	}
-
 }
 
 func createTables(db *sqlx.DB) {

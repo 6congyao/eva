@@ -63,10 +63,10 @@ func (pa PolAgent) NormalizePolicies() (policy.Policies, error) {
 
 		for _, s := range pi.Statements {
 			statement := &policy.DefaultStatement{
-				Principals: utils.ItoS(s.Principals),
+				Principals: utils.ToStringSlice(s.Principals),
 				Effect:     s.Effect,
-				Actions:    utils.ItoS(s.Actions),
-				Resources:  utils.ItoS(s.Resources),
+				Actions:    utils.ToStringSlice(s.Actions),
+				Resources:  utils.ToStringSlice(s.Resources),
 			}
 
 			statements = append(statements, *statement)
