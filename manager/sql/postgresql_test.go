@@ -22,6 +22,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"log"
 	_ "github.com/lib/pq"
+	_ "github.com/go-sql-driver/mysql"
 	"eva/policy"
 	"fmt"
 )
@@ -169,17 +170,24 @@ func TestPgSqlManager_FindCandidates(t *testing.T) {
 			t.Errorf("FAIL! case %d length not equal ! %s",k,checkFail)
 			continue
 		}
+		fail:=false
+		var output []string
+		var correct []string
 		for k1,_:=range p {
 			//statement:=c.GetStatements()
-			output:=fmt.Sprintf("%#v",p[k1])
-			correct:=fmt.Sprintf("%#v",testCase.output[k1])
-			if output !=correct{
-				t.Errorf("FAIL! case %d Policy not equal !\n Policy %d: output is:%s but correct is %s %s\n",k,k1,output,correct,checkFail)
-				break
+			output=append(output,fmt.Sprintf("%#v",p[k1]))
+			correct=append(correct,fmt.Sprintf("%#v",testCase.output[k1]))
 			}
+		if !isSamePolicy(output,correct){
+			t.Errorf("FAIL! case %d Policy not equal !\noutput is:%s but correct is %s %s\n",k,output,correct,checkFail)
+			fail=true
+			break
 
 		}
-		//t.Logf("PASS ! case %d %s",k,checkPass)
+		if !fail {
+			t.Logf("PASS ! case %d %s",k,checkPass)
+		}
+
 	}
 
 }
@@ -199,4 +207,31 @@ func sqlInit() *PgSqlManager {
 	//insertBindings(db, mock.Jps)
 
 	return NewPgSqlManager(db)
+}
+
+//Judge two string slience is same but may be not in order,
+//algorithm may be can improve
+func isSamePolicy(s,t[]string) bool{
+	if len(s)!=len(t){
+		return false
+	}
+	if len(s)==0&&len(t)==0 {
+		return true
+	}
+	for _,sk:=range s{
+		found:=false
+		for _,tk:=range t{
+			if sk==tk{
+				found=true
+				break
+			}
+		}
+		if found {
+			continue
+		}
+		if sk!=t[len(t)-1]{
+			return false
+		}
+	}
+	return true
 }
