@@ -1,0 +1,7 @@
+INSERT INTO public.policy_binding (resource_id, entity_urn, binding_context, policy_id, resource_type) VALUES ('usr-a0XejM2V', 'qrn:partition::iam:usr-Vtl3VCfF:user/Lucy', '/', 'iamp-cy6bTxYn', 'user');
+INSERT INTO public.policy_binding (resource_id, entity_urn, binding_context, policy_id, resource_type) VALUES ('usr-k1352uvc', 'qrn:partition::iam:usr-Vtl3VCfF:user/Tom', '/', 'iamp-cy6bTxYn', 'user');
+INSERT INTO public.policy_binding (resource_id, entity_urn, binding_context, policy_id, resource_type) VALUES ('usr-a0XejM2V', 'qrn:partition::iam:usr-Vtl3VCfF:user/OpenPitrix/Lucy', '/OpenPitrix', 'iamp-tft72s3p', 'user');
+INSERT INTO public.policy_binding (resource_id, entity_urn, binding_context, policy_id, resource_type) VALUES ('usr-k1352uvc', 'qrn:partition::iam:usr-Vtl3VCfF:user/OpenPitrix/Tom', '/OpenPitrix', 'iamp-tft72s3p', 'user');
+INSERT INTO public.policy_binding (resource_id, entity_urn, binding_context, policy_id, resource_type) VALUES ('usr-k1352uvc', 'qrn:partition::iam:usr-Vtl3VCfF:user/OpenPitrix/Tom', '/OpenPitrix', 'iamp-cy6bTxYp', 'user');
+INSERT INTO public.policy_binding (resource_id, entity_urn, binding_context, policy_id, resource_type) VALUES ('grp-k1352uv2', 'qrn:partition::iam:usr-Vtl3VCfF:group/OpenPitrix/dev', '/OpenPitrix', 'iamp-cy6bTxYn', 'group');
+INSERT INTO public.policy_binding (resource_id, entity_urn, binding_context, policy_id, resource_type) VALUES ('usr-k1352uvc', 'qrn:partition::iam:usr-Vtl3VCfF:user/Tom', '/', 'iamp-cy6bTxYp', 'user');
