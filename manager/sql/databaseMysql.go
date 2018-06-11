@@ -17,6 +17,7 @@ package sql
 
 
 //It's scheme should same as postgresql
+//Also work well in pg latest
 var SchemaMysql=`CREATE TABLE IF NOT EXISTS iam_policy (
   policy_id    VARCHAR(50)       UNIQUE                     NOT NULL,
   policy_name  VARCHAR(255) DEFAULT ''                      NOT NULL,
