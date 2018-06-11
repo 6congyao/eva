@@ -20,17 +20,16 @@ import (
 	"eva/agent"
 	"eva/manager/memory"
 	"eva/manager/sql"
-
 	"eva/policy"
 	"eva/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
-
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"log"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var hostname string
