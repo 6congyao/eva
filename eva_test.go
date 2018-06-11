@@ -78,14 +78,7 @@ var testCases = []testCase{
 		},
 		AuthorizeResult: nil,
 	},
-	{
-		keys: []string{"qrn:partition::iam:usr-Vtl3VCfF:user/OpenPitrix/Tom", "qrn:partition::iam:usr-Vtl3VCfF:user/Tom"},
-		rcs: []*agent.RequestContext{
-			{"", "k8s:list", "k8s:pods "},
-			{"", "k8s:watch", "k8s:pods/log"},
-		},
-		AuthorizeResult: nil,
-	},
+
 	{
 		keys: []string{"qrn:partition::iam:usr-Vtl3VCfF:user/OpenPitrix/To", "qrn:partition::iam:usr-Vtl3VCfF:user/To"},
 		rcs: []*agent.RequestContext{
@@ -97,13 +90,21 @@ var testCases = []testCase{
 	{
 		keys: []string{"qrn:partition::iam:usr-Vtl3VCfF:user/OpenPitrix/Tom", "qrn:partition::iam:usr-Vtl3VCfF:user/Tom"},
 		rcs: []*agent.RequestContext{
-			{"", "k8s:list ", "k8s:pods"}, //may be forget trim?
+			{"", "k8s:list ", "k8s:pods"}, //(Action)may be forget trim?
+			{"", "k8s:watch", "k8s:pods/log"},
+		},
+		AuthorizeResult: nil,
+	},
+	{
+		keys: []string{"qrn:partition::iam:usr-Vtl3VCfF:user/OpenPitrix/Tom", "qrn:partition::iam:usr-Vtl3VCfF:user/Tom"},
+		rcs: []*agent.RequestContext{
+			{"", "k8s:list", "k8s:pods "},//(Resource)may be forget trim?
 			{"", "k8s:watch", "k8s:pods/log"},
 		},
 		AuthorizeResult: nil,
 	},
 }
-
+//connect, authorize...etc
 var warden *Eva00
 
 func TestEva00_Authorize(t *testing.T) {
@@ -126,6 +127,7 @@ func TestEva00_Authorize(t *testing.T) {
 	}
 
 }
+//judge err type: nil(Allow) default Explicit
 func switchType(err error) string {
 	switch e := err.(type) {
 
@@ -138,9 +140,13 @@ func switchType(err error) string {
 	}
 
 }
+
+//get error type
 func typeof(v interface{}) string {
 	return fmt.Sprintf("%T", v)
 }
+
+//connect database
 func sqlInit() *sql.PgSqlManager {
 
 	dbDrv := os.Getenv(EnvDBDriver)
