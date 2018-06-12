@@ -93,7 +93,8 @@ var testCases = []testCase{
 			{"", "k8s:list ", "k8s:pods"}, //(Action)may be forget trim?
 			{"", "k8s:watch", "k8s:pods/log"},
 		},
-		AuthorizeResult: nil,
+		//AuthorizeResult: nil, //trimmed
+		AuthorizeResult:utils.NewErrDefaultDenied(nil),//do not trim
 	},
 	{
 		keys: []string{"qrn:partition::iam:usr-Vtl3VCfF:user/OpenPitrix/Tom", "qrn:partition::iam:usr-Vtl3VCfF:user/Tom"},
@@ -101,7 +102,8 @@ var testCases = []testCase{
 			{"", "k8s:list", "k8s:pods "},//(Resource)may be forget trim?
 			{"", "k8s:watch", "k8s:pods/log"},
 		},
-		AuthorizeResult: nil,
+		//AuthorizeResult: nil,//trimmed
+		AuthorizeResult:utils.NewErrDefaultDenied(nil),// do not trim
 	},
 }
 //connect, authorize...etc
