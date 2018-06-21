@@ -22,15 +22,14 @@ import (
 	"eva/manager/sql"
 	"eva/policy"
 	"eva/utils"
-	"github.com/gin-gonic/gin"
-	"net/http"
-	"os"
 	"fmt"
+	"github.com/gin-gonic/gin"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"log"
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/stackimpact/stackimpact-go"
+	"net/http"
+	"os"
 )
 
 var hostname string
@@ -39,23 +38,7 @@ var ready = false
 
 func main() {
 	evaInit()
-	stackCheck := stackimpact.Start(stackimpact.Options{
-		AgentKey: "692f8bc6ef5e3d8fb9c809e34dbb50199cb8ff9e",
-		AppName: "MyGoApp",
-	})
-	_=stackCheck
-	span := stackCheck.Profile()
-	defer span.Stop()
-	router := gin.Default()
-	router.GET("/healthy", healthy)
-	router.POST("/evaluation", auth)
-
-	// For testing proposal
-	router.POST("/policy", createPolicy)
-	router.GET("/policy", getPolicy)
-
-	ready = true
-	router.Run()
+	routerInit()
 }
 
 func evaInit() {
@@ -79,10 +62,6 @@ func evaInit() {
 	//}
 }
 
-func memoryInit() *memory.MemoryManager {
-	return memory.NewMemoryManager()
-}
-
 func sqlInit() *sql.PgSqlManager {
 	dbDrv := os.Getenv(eva.EnvDBDriver)
 	dbSrc := os.Getenv(eva.EnvDBSource)
@@ -93,11 +72,21 @@ func sqlInit() *sql.PgSqlManager {
 		log.Fatalf("Could not connect to database: %s", err)
 	}
 
-	//createTables(db)
-	//insertPolicies(db, mock.Jps)
-	//insertBindings(db, mock.Jps)
-
 	return sql.NewPgSqlManager(db)
+}
+
+func routerInit() {
+	router := gin.Default()
+
+	router.GET("/healthy", healthy)
+	router.POST("/evaluation", auth)
+
+	// For testing proposal
+	router.POST("/policy", createPolicy)
+	router.GET("/policy", getPolicy)
+
+	ready = true
+	router.Run()
 }
 
 func auth(c *gin.Context) {
@@ -163,6 +152,10 @@ func createPolicy(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
+}
+
+func memoryInit() *memory.MemoryManager {
+	return memory.NewMemoryManager()
 }
 
 func createTables(db *sqlx.DB) {
