@@ -137,8 +137,11 @@ func TestNormalizeRequests(t *testing.T) {
 func BenchmarkReqAgent_NormalizeRequests(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
+
 		for _, x := range testCases {
+			//b.StartTimer()
 			x.input.NormalizeRequests()
+			//b.StopTimer()
 			i++
 		}
 	}
