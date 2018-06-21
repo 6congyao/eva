@@ -30,6 +30,7 @@ import (
 	_ "github.com/lib/pq"
 	"log"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/stackimpact/stackimpact-go"
 )
 
 var hostname string
@@ -38,8 +39,14 @@ var ready = false
 
 func main() {
 	evaInit()
+	stackCheck := stackimpact.Start(stackimpact.Options{
+		AgentKey: "692f8bc6ef5e3d8fb9c809e34dbb50199cb8ff9e",
+		AppName: "MyGoApp",
+	})
+	_=stackCheck
+	span := stackCheck.Profile()
+	defer span.Stop()
 	router := gin.Default()
-
 	router.GET("/healthy", healthy)
 	router.POST("/evaluation", auth)
 

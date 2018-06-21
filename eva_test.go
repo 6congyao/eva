@@ -26,6 +26,8 @@ import (
 	"eva/utils"
 	"github.com/jmoiron/sqlx"
 	"os"
+	"math/rand"
+	"eva/policy"
 )
 
 const checkPass = "\u2713"
@@ -94,25 +96,27 @@ var testCases = []testCase{
 			{"", "k8s:watch", "k8s:pods/log"},
 		},
 		//AuthorizeResult: nil, //trimmed
-		AuthorizeResult:utils.NewErrDefaultDenied(nil),//do not trim
+		AuthorizeResult: utils.NewErrDefaultDenied(nil), //do not trim
 	},
 	{
 		keys: []string{"qrn:partition::iam:usr-Vtl3VCfF:user/OpenPitrix/Tom", "qrn:partition::iam:usr-Vtl3VCfF:user/Tom"},
 		rcs: []*agent.RequestContext{
-			{"", "k8s:list", "k8s:pods "},//(Resource)may be forget trim?
+			{"", "k8s:list", "k8s:pods "}, //(Resource)may be forget trim?
 			{"", "k8s:watch", "k8s:pods/log"},
 		},
 		//AuthorizeResult: nil,//trimmed
-		AuthorizeResult:utils.NewErrDefaultDenied(nil),// do not trim
+		AuthorizeResult: utils.NewErrDefaultDenied(nil), // do not trim
 	},
 }
 //connect, authorize...etc
 var warden *Eva00
 
-func TestEva00_Authorize(t *testing.T) {
+func init() {
 	warden = &Eva00{
 		Manager: sqlInit(),
 	}
+}
+func TestEva00_Authorize(t *testing.T) {
 	for c, k := range testCases {
 		err := warden.Authorize(k.rcs, k.keys)
 		if err == k.AuthorizeResult {
@@ -129,6 +133,45 @@ func TestEva00_Authorize(t *testing.T) {
 	}
 
 }
+func BenchmarkEva00_Authorize(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		c := testCases[rand.Intn(len(testCases))]
+		warden.Authorize(c.rcs, c.keys)
+	}
+}
+
+func BenchmarkEva00_Evaluate(b *testing.B) {
+	b.ReportAllocs()
+	//begin:
+	//c := testCases[rand.Intn(len(testCases))]
+	//polices, err := warden.Manager.FindCandidates(c.keys)
+	//if err != nil {
+	//	goto begin
+	//}
+	//prepare testcase
+	var policesSlice []policy.Policies
+	var rcsSlice [][]*agent.RequestContext
+	for _, x := range testCases {
+		polices, err := warden.Manager.FindCandidates(x.keys)
+		if err != nil {
+			continue
+		}
+		policesSlice = append(policesSlice, polices)
+		rcsSlice = append(rcsSlice, x.rcs)
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		for s:=range policesSlice{
+			warden.Evaluate(rcsSlice[s], policesSlice[s])
+			i++
+		}
+
+	}
+
+}
+
 //judge err type: nil(Allow) default Explicit
 func switchType(err error) string {
 	switch e := err.(type) {
