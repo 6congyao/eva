@@ -23,165 +23,39 @@ import (
 	"log"
 	_ "github.com/lib/pq"
 	_ "github.com/go-sql-driver/mysql"
-	"eva/policy"
 	"fmt"
 )
 
 const checkPass = "\u2713"
 const checkFail = "\u2717"
-var testCases=[]struct{
-	input []string
-	output policy.Policies
-}{
-	{
-		[]string{"qrn:partition::iam:usr-Vtl3VCfF:group/OpenPitrix/dev"},
-		policy.Policies{
-			&policy.DefaultPolicy{
-				ID:"",
-				Version:"2018-5-4",
-				Name:"",
-				Urn:"",
-				Description:"",
-				Statements:[]policy.DefaultStatement{
-					policy.DefaultStatement{
-						Principals:[]string(nil),
-						Effect:"allow",
-						Actions:[]string{"iam:CreatePolicy",
-							"iam:DeletePolicy",
-						},
-						Resources:[]string{"*"},
-					},
-					policy.DefaultStatement{
-						Principals:[]string(nil),
-						Effect:"allow",
-						Actions:[]string{"iam:CreateRole"},
-						Resources:[]string{"*"},
-					},
-				},
-			},
-
-		},
-
-	},
-	{
-		[]string{"qrn:partition::iam:usr-Vtl3VCfF:user/Lucy"},
-		policy.Policies{
-			&policy.DefaultPolicy{
-				ID:"",
-				Version:"2018-5-4",
-				Name:"",
-				Urn:"",
-				Description:"",
-				Statements:[]policy.DefaultStatement{
-					policy.DefaultStatement{
-						Principals:[]string(nil),
-						Effect:"allow",
-						Actions:[]string{"iam:CreatePolicy",
-							"iam:DeletePolicy",
-						},
-						Resources:[]string{"*"},
-					},
-					policy.DefaultStatement{
-						Principals:[]string(nil),
-						Effect:"allow",
-						Actions:[]string{"iam:CreateRole"},
-						Resources:[]string{"*"},
-					},
-				},
-			},
-
-		},
-	},
-	{
-		[]string{"qrn:partition::iam:usr-Vtl3VCfF:user/OpenPitrix/Lucy"},
-		policy.Policies{
-			&policy.DefaultPolicy{ID:"", Version:"2012-04-01", Name:"", Urn:"", Description:"", Statements:[]policy.DefaultStatement{policy.DefaultStatement{Principals:[]string(nil), Effect:"deny", Actions:[]string{"qstor:modify", "qstor:delete"}, Resources:[]string{"qstor:*"}}}},
-		},
-	},
-	{
-		[]string{"qrn:partition::iam:usr-Vtl3VCfF:user/OpenPitrix/Tom"},
-		policy.Policies{
-			&policy.DefaultPolicy{ID:"", Version:"2018-5-5", Name:"", Urn:"", Description:"", Statements:[]policy.DefaultStatement{policy.DefaultStatement{Principals:[]string(nil), Effect:"allow", Actions:[]string{"k8s:list", "k8s:get"}, Resources:[]string{"k8s:pods"}}, policy.DefaultStatement{Principals:[]string(nil), Effect:"allow", Actions:[]string{"k8s:watch"}, Resources:[]string{"k8s:pods", "k8s:pods/log"}}}},
-			&policy.DefaultPolicy{ID:"", Version:"2012-04-01", Name:"", Urn:"", Description:"", Statements:[]policy.DefaultStatement{policy.DefaultStatement{Principals:[]string(nil), Effect:"deny", Actions:[]string{"qstor:modify", "qstor:delete"}, Resources:[]string{"qstor:*"}}}},
-		},
-	},
-	{
-		[]string{"qrn:partition::iam:usr-Vtl3VCfF:user/Tom"},
-		policy.Policies{
-			&policy.DefaultPolicy{ID:"", Version:"2018-5-5", Name:"", Urn:"", Description:"", Statements:[]policy.DefaultStatement{policy.DefaultStatement{Principals:[]string(nil), Effect:"allow", Actions:[]string{"k8s:list", "k8s:get"}, Resources:[]string{"k8s:pods"}}, policy.DefaultStatement{Principals:[]string(nil), Effect:"allow", Actions:[]string{"k8s:watch"}, Resources:[]string{"k8s:pods", "k8s:pods/log"}}}},
-			&policy.DefaultPolicy{ID:"", Version:"2018-5-4", Name:"", Urn:"", Description:"", Statements:[]policy.DefaultStatement{policy.DefaultStatement{Principals:[]string(nil), Effect:"allow", Actions:[]string{"iam:CreatePolicy", "iam:DeletePolicy"}, Resources:[]string{"*"}}, policy.DefaultStatement{Principals:[]string(nil), Effect:"allow", Actions:[]string{"iam:CreateRole"}, Resources:[]string{"*"}}}},
-		},
-	},
-	{
-		[]string{"1","qrn:partition::iam:usr-Vtl3VCfF:user/Tom"},
-		policy.Policies{
-			&policy.DefaultPolicy{ID:"", Version:"2018-5-5", Name:"", Urn:"", Description:"", Statements:[]policy.DefaultStatement{policy.DefaultStatement{Principals:[]string(nil), Effect:"allow", Actions:[]string{"k8s:list", "k8s:get"}, Resources:[]string{"k8s:pods"}}, policy.DefaultStatement{Principals:[]string(nil), Effect:"allow", Actions:[]string{"k8s:watch"}, Resources:[]string{"k8s:pods", "k8s:pods/log"}}}},
-			&policy.DefaultPolicy{ID:"", Version:"2018-5-4", Name:"", Urn:"", Description:"", Statements:[]policy.DefaultStatement{policy.DefaultStatement{Principals:[]string(nil), Effect:"allow", Actions:[]string{"iam:CreatePolicy", "iam:DeletePolicy"}, Resources:[]string{"*"}}, policy.DefaultStatement{Principals:[]string(nil), Effect:"allow", Actions:[]string{"iam:CreateRole"}, Resources:[]string{"*"}}}},
-		},
-	},
-	{
-		[]string{"qrn:partition::iam:usr-Vtl3VCfF:user/Tom","qrn:partition::iam:usr-Vtl3VCfF:user/OpenPitrix/Tom"},
-		policy.Policies{
-			&policy.DefaultPolicy{ID:"", Version:"2018-5-5", Name:"", Urn:"", Description:"", Statements:[]policy.DefaultStatement{policy.DefaultStatement{Principals:[]string(nil), Effect:"allow", Actions:[]string{"k8s:list", "k8s:get"}, Resources:[]string{"k8s:pods"}}, policy.DefaultStatement{Principals:[]string(nil), Effect:"allow", Actions:[]string{"k8s:watch"}, Resources:[]string{"k8s:pods", "k8s:pods/log"}}}},
-			&policy.DefaultPolicy{ID:"", Version:"2018-5-5", Name:"", Urn:"", Description:"", Statements:[]policy.DefaultStatement{policy.DefaultStatement{Principals:[]string(nil), Effect:"allow", Actions:[]string{"k8s:list", "k8s:get"}, Resources:[]string{"k8s:pods"}}, policy.DefaultStatement{Principals:[]string(nil), Effect:"allow", Actions:[]string{"k8s:watch"}, Resources:[]string{"k8s:pods", "k8s:pods/log"}}}},
-			&policy.DefaultPolicy{ID:"", Version:"2012-04-01", Name:"", Urn:"", Description:"", Statements:[]policy.DefaultStatement{policy.DefaultStatement{Principals:[]string(nil), Effect:"deny", Actions:[]string{"qstor:modify", "qstor:delete"}, Resources:[]string{"qstor:*"}}}},
-			&policy.DefaultPolicy{ID:"", Version:"2018-5-4", Name:"", Urn:"", Description:"", Statements:[]policy.DefaultStatement{policy.DefaultStatement{Principals:[]string(nil), Effect:"allow", Actions:[]string{"iam:CreatePolicy", "iam:DeletePolicy"}, Resources:[]string{"*"}}, policy.DefaultStatement{Principals:[]string(nil), Effect:"allow", Actions:[]string{"iam:CreateRole"}, Resources:[]string{"*"}}}},
-		},
-	},
-	{
-		[]string{ "qrn:partition::iam:usr-Vtl3VCfF:user/Tom",
-			"qrn:partition::iam:usr-Vtl3VCfF:user/OpenPitrix/Tom",
-			"qrn:partition::iam:usr-Vtl3VCfF:user/Lucy"},
-		policy.Policies{
-			&policy.DefaultPolicy{ID:"", Version:"2018-5-4", Name:"", Urn:"", Description:"", Statements:[]policy.DefaultStatement{policy.DefaultStatement{Principals:[]string(nil), Effect:"allow", Actions:[]string{"iam:CreatePolicy", "iam:DeletePolicy"}, Resources:[]string{"*"}}, policy.DefaultStatement{Principals:[]string(nil), Effect:"allow", Actions:[]string{"iam:CreateRole"}, Resources:[]string{"*"}}}},
-			&policy.DefaultPolicy{ID:"", Version:"2018-5-4", Name:"", Urn:"", Description:"", Statements:[]policy.DefaultStatement{policy.DefaultStatement{Principals:[]string(nil), Effect:"allow", Actions:[]string{"iam:CreatePolicy", "iam:DeletePolicy"}, Resources:[]string{"*"}}, policy.DefaultStatement{Principals:[]string(nil), Effect:"allow", Actions:[]string{"iam:CreateRole"}, Resources:[]string{"*"}}}},
-			&policy.DefaultPolicy{ID:"", Version:"2012-04-01", Name:"", Urn:"", Description:"", Statements:[]policy.DefaultStatement{policy.DefaultStatement{Principals:[]string(nil), Effect:"deny", Actions:[]string{"qstor:modify", "qstor:delete"}, Resources:[]string{"qstor:*"}}}},
-			&policy.DefaultPolicy{ID:"", Version:"2018-5-5", Name:"", Urn:"", Description:"", Statements:[]policy.DefaultStatement{policy.DefaultStatement{Principals:[]string(nil), Effect:"allow", Actions:[]string{"k8s:list", "k8s:get"}, Resources:[]string{"k8s:pods"}}, policy.DefaultStatement{Principals:[]string(nil), Effect:"allow", Actions:[]string{"k8s:watch"}, Resources:[]string{"k8s:pods", "k8s:pods/log"}}}},
-			&policy.DefaultPolicy{ID:"", Version:"2018-5-5", Name:"", Urn:"", Description:"", Statements:[]policy.DefaultStatement{policy.DefaultStatement{Principals:[]string(nil), Effect:"allow", Actions:[]string{"k8s:list", "k8s:get"}, Resources:[]string{"k8s:pods"}}, policy.DefaultStatement{Principals:[]string(nil), Effect:"allow", Actions:[]string{"k8s:watch"}, Resources:[]string{"k8s:pods", "k8s:pods/log"}}}},
-
-		},
-	},
-	{
-		[]string{"qrn:partition::iam:usr-Vtl3VCfF:user/*"},
-		nil,
-	},
-	{
-		[]string{"qrn:partition::iam:usr-Vtl3VCfF:user/OpenPitrix/*"},
-		nil,
-	},
-	{
-		[]string{"qrn:partition::iam:usr-Vtl3VCfF:user/*","qrn:partition::iam:usr-Vtl3VCfF:user/OpenPitrix/*"},
-		nil,
-	},
-}
 
 func TestPgSqlManager_FindCandidates(t *testing.T) {
-	db:=sqlInit()
-	if db==nil{
-		t.Errorf("FAIL! unable connect database ! %s",checkFail)
+	db := sqlInit()
+	if db == nil {
+		t.Errorf("FAIL! unable connect database ! %s", checkFail)
 	}
 
-	for k,testCase:=range testCases{
-		p,err:=db.FindCandidates(testCase.input)
+	for k, testCase := range testCases {
+		p, err := db.FindCandidates(testCase.input)
 
-		if err!=nil{
+		if err != nil {
 			t.Error(err)
 		}
-		if len(p)!=len(testCase.output){
-			t.Errorf("FAIL! case %d length not equal ! %s",k,checkFail)
+		if len(p) != len(testCase.output) {
+			t.Errorf("FAIL! case %d length not equal ! %s", k, checkFail)
 			continue
 		}
-		fail:=false
+		fail := false
 		var output []string
 		var correct []string
-		for k1,_:=range p {
+		for k1 := range p {
 			//statement:=c.GetStatements()
-			output=append(output,fmt.Sprintf("%#v",p[k1]))
-			correct=append(correct,fmt.Sprintf("%#v",testCase.output[k1]))
-			}
-		if !isSamePolicy(output,correct){
-			t.Errorf("FAIL! case %d Policy not equal !\noutput is:%s but correct is %s %s\n",k,output,correct,checkFail)
-			fail=true
+			output = append(output, fmt.Sprintf("%#v", p[k1]))
+			correct = append(correct, fmt.Sprintf("%#v", testCase.output[k1]))
+		}
+		if !isSamePolicy(output, correct) {
+			t.Errorf("FAIL! case %d Policy not equal !\noutput is:%s but correct is %s %s\n", k, output, correct, checkFail)
+			fail = true
 			break
 
 		}
@@ -192,6 +66,20 @@ func TestPgSqlManager_FindCandidates(t *testing.T) {
 	}
 
 }
+//only about 2000/s on localhost?
+func BenchmarkPgSqlManager_FindCandidates(b *testing.B) {
+	db := sqlInit()
+	b.ResetTimer()
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		for _, x := range testCases {
+			//testcase := testCases[rand.Intn(len(testCases))]
+			db.FindCandidates(x.input)
+			i++
+		}
+	}
+}
+
 func sqlInit() *PgSqlManager {
 
 	dbDrv := os.Getenv(eva.EnvDBDriver)
@@ -212,25 +100,25 @@ func sqlInit() *PgSqlManager {
 
 //Judge two string slience is same but may be not in order,
 //algorithm may be can improve
-func isSamePolicy(s,t[]string) bool{
-	if len(s)!=len(t){
+func isSamePolicy(s, t []string) bool {
+	if len(s) != len(t) {
 		return false
 	}
-	if len(s)==0&&len(t)==0 {
+	if len(s) == 0 && len(t) == 0 {
 		return true
 	}
-	for _,sk:=range s{
-		found:=false
-		for _,tk:=range t{
-			if sk==tk{
-				found=true
+	for _, sk := range s {
+		found := false
+		for _, tk := range t {
+			if sk == tk {
+				found = true
 				break
 			}
 		}
 		if found {
 			continue
 		}
-		if sk!=t[len(t)-1]{
+		if sk != t[len(t)-1] {
 			return false
 		}
 	}

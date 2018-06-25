@@ -14,4 +14,4 @@
  ******************************************************************************/
 
 package agent
-//todo
+//has covered by sql.FindCandidates
