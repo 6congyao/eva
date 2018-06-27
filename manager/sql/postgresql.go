@@ -73,15 +73,25 @@ func (m *PgSqlManager) FindCandidates(keys []string) (policy.Policies, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-
+	if rows != nil {
+		defer rows.Close()
+	}
 	return scanRows(rows)
 }
 
 // Get retrieves a policy.
 func (m *PgSqlManager) Get(id string) (policy.Policy, error) {
-
-	return nil, nil
+	query := m.db.Rebind(getOneQuery)
+	row, err := m.db.Queryx(query,id)
+	if err != nil {
+		return nil, err
+	}
+	defer row.Close()
+	data, err := scanRows(row)
+	if len(data)==0{
+		return nil ,err
+	}
+	return data[0], err
 }
 
 // Delete removes a policy.
