@@ -38,12 +38,18 @@ type Eva interface {
 }
 
 // Eva instance Eva00 inspired by "Ayanami Rei" :P.
-type Eva00 struct {
-	Manager manager.Manager
+type eva00 struct {
+	manager manager.Manager
 	matcher matcher.Matcher
 }
 
-func (e *Eva00) Matcher() matcher.Matcher {
+func NewEva(man manager.Manager) Eva {
+	return &eva00{
+		manager: man,
+	}
+}
+
+func (e *eva00) Matcher() matcher.Matcher {
 	if e.matcher == nil {
 		e.matcher = matcher.DefaultMatcher
 	}
@@ -51,8 +57,8 @@ func (e *Eva00) Matcher() matcher.Matcher {
 }
 
 // Authorize returns nil if principal p can perform action a on resource r with condition c or an error otherwise.
-func (e *Eva00) Authorize(rcs []*agent.RequestContext, keys []string) error {
-	policies, err := e.Manager.FindCandidates(keys)
+func (e *eva00) Authorize(rcs []*agent.RequestContext, keys []string) error {
+	policies, err := e.manager.FindCandidates(keys)
 	if err != nil {
 		return err
 	}
@@ -65,7 +71,7 @@ func (e *Eva00) Authorize(rcs []*agent.RequestContext, keys []string) error {
 
 // Evaluate returns nil if principal p has permission p on resource r with condition c for a given policy list or an error otherwise.
 // The Authorize interface should be preferred since it uses the manager directly. This is a lower level interface for when you don't want to use the eva manager.
-func (e *Eva00) Evaluate(rcs []*agent.RequestContext, policies policy.Policies) error {
+func (e *eva00) Evaluate(rcs []*agent.RequestContext, policies policy.Policies) error {
 	//var deciders = policy.Policies{}
 	var allowDeciders = policy.Policies{}
 	var denyDeciders = policy.Policies{}

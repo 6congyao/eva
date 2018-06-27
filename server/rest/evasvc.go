@@ -33,8 +33,9 @@ import (
 )
 
 var hostname string
-var warden *eva.Eva00
+var warden eva.Eva
 var ready = false
+var manager *sql.PgSqlManager
 
 func main() {
 	evaInit()
@@ -44,9 +45,12 @@ func main() {
 func evaInit() {
 	hostname, _ = os.Hostname()
 
-	warden = &eva.Eva00{
-		Manager: sqlInit(),
-	}
+	//warden = &eva.Eva00{
+	//	Manager: sqlInit(),
+	//}
+
+	manager = sqlInit()
+	warden = eva.NewEva(manager)
 
 	//for _, pol := range mock.Policies {
 	//	warden.Manager.Create(pol)
@@ -134,7 +138,7 @@ func healthy(c *gin.Context) {
 }
 
 func getPolicy(c *gin.Context) {
-	policies, err := warden.Manager.GetAll(100, 0)
+	policies, err := manager.GetAll(1000, 0)
 
 	if err == nil {
 		c.JSON(http.StatusOK, gin.H{"policies": policies})
@@ -147,7 +151,7 @@ func createPolicy(c *gin.Context) {
 	dp := &policy.DefaultPolicy{}
 
 	if err := c.ShouldBindJSON(dp); err == nil {
-		warden.Manager.Create(dp)
+		manager.Create(dp)
 		c.JSON(http.StatusOK, gin.H{"status": "create successfully", "from": hostname})
 	} else {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
