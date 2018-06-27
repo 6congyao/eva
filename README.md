@@ -4,6 +4,20 @@ Policy-based evaluation service.
 [![Build Status](https://travis-ci.org/6congyao/eva.svg?branch=master)](https://travis-ci.org/6congyao/eva)
 <h1 align="center"><img src="./docs/images/eva_design.png"></h1>
 
+## configure
+
+You need set two envs:  
+```bash
+# use postgres
+EVA_DB_DRIVER=postgres
+EVA_DB_SOURCE=postgres://username:password@139.198.177.115:5432/iam?sslmode\=disable
+# use mysql
+EVA_DB_DRIVER=mysql
+EVA_DB_SOURCE=username:password@tcp\(qing.cugctf.top:3306\)/public
+export EVA_DB_DRIVER
+export EVA_DB_SOURCE
+```
+
 ## API
 
 ### /healthy

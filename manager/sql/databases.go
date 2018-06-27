@@ -65,3 +65,10 @@ var getAllQuery = `SELECT
 		policy_id, statement
 	FROM
 		iam_policy LIMIT ? OFFSET ?`
+
+var getOneQuery= `SELECT
+		policy_id, statement
+	FROM
+		iam_policy 
+	WHERE
+		policy_id= ?`

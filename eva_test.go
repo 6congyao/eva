@@ -26,8 +26,8 @@ import (
 	"eva/utils"
 	"github.com/jmoiron/sqlx"
 	"os"
-	"math/rand"
 	"eva/policy"
+	"math/rand"
 )
 
 const checkPass = "\u2713"
@@ -134,10 +134,24 @@ func TestEva00_Authorize(t *testing.T) {
 
 }
 func BenchmarkEva00_Authorize(b *testing.B) {
+	//var wg sync.Mutex
 	b.ReportAllocs()
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
+		//wg.Add(1)
+		//go func() {
+		//defer wg.Done()
 		c := testCases[rand.Intn(len(testCases))]
 		warden.Authorize(c.rcs, c.keys)
+		//}()
+	}
+	//wg.Wait()
+}
+func BenchmarkEva00_DatabaseSpeed(b *testing.B) {
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		warden.Manager.Get("iamp-cy6bTxYp")
 	}
 }
 
@@ -163,7 +177,7 @@ func BenchmarkEva00_Evaluate(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		for s:=range policesSlice{
+		for s := range policesSlice {
 			warden.Evaluate(rcsSlice[s], policesSlice[s])
 			i++
 		}
