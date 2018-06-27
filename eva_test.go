@@ -16,18 +16,18 @@
 package eva
 
 import (
-	"testing"
-	"fmt"
 	"eva/agent"
 	"eva/manager/sql"
-	_ "github.com/lib/pq"
-	_ "github.com/go-sql-driver/mysql"
-	"log"
-	"eva/utils"
-	"github.com/jmoiron/sqlx"
-	"os"
 	"eva/policy"
+	"eva/utils"
+	"fmt"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
+	"log"
 	"math/rand"
+	"os"
+	"testing"
 )
 
 const checkPass = "\u2713"
@@ -108,12 +108,13 @@ var testCases = []testCase{
 		AuthorizeResult: utils.NewErrDefaultDenied(nil), // do not trim
 	},
 }
+
 //connect, authorize...etc
-var warden *Eva00
+var warden *eva00
 
 func init() {
-	warden = &Eva00{
-		Manager: sqlInit(),
+	warden = &eva00{
+		manager: sqlInit(),
 	}
 }
 func TestEva00_Authorize(t *testing.T) {
@@ -151,7 +152,7 @@ func BenchmarkEva00_DatabaseSpeed(b *testing.B) {
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		warden.Manager.Get("iamp-cy6bTxYp")
+		warden.manager.Get("iamp-cy6bTxYp")
 	}
 }
 
@@ -167,7 +168,7 @@ func BenchmarkEva00_Evaluate(b *testing.B) {
 	var policesSlice []policy.Policies
 	var rcsSlice [][]*agent.RequestContext
 	for _, x := range testCases {
-		polices, err := warden.Manager.FindCandidates(x.keys)
+		polices, err := warden.manager.FindCandidates(x.keys)
 		if err != nil {
 			continue
 		}

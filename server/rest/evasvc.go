@@ -165,23 +165,3 @@ func memoryInit() *memory.MemoryManager {
 func createTables(db *sqlx.DB) {
 	db.MustExec(sql.Schema)
 }
-
-func insertPolicies(db *sqlx.DB, policies []string) {
-	tx := db.MustBegin()
-
-	for _, v := range policies {
-		tx.MustExec("INSERT INTO iam_policy (statement) VALUES ($1)", v)
-	}
-
-	tx.Commit()
-}
-
-func insertBindings(db *sqlx.DB, policies []string) {
-	tx := db.MustBegin()
-
-	for i, _ := range policies {
-		tx.MustExec("INSERT INTO policy_binding (entity_urn, policy_id) VALUES ($1, $2)", "qrn:user/op/max", i+1)
-	}
-
-	tx.Commit()
-}

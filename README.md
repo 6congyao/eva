@@ -136,8 +136,3 @@ Explicit Deny(Http 403):
   "type": "Explicit"
 }
 ```
-
-## Installation:
-### Env setup:
-EVA_DB_DRIVER = "postgres"
-EVA_DB_SOURCE = "postgres://<uname>:<password>@x.x.x.x:5432/<db-name>?sslmode=disable"
