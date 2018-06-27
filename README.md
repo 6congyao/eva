@@ -10,10 +10,10 @@ You need set two envs:
 ```bash
 # use postgres
 EVA_DB_DRIVER=postgres
-EVA_DB_SOURCE=postgres://<uname>:<password>@<ip/domain>:5432/iam?sslmode\=disable
+EVA_DB_SOURCE=postgres://<uname>:<password>@<ip/domain>:5432/<db-name>?sslmode\=disable
 # use mysql
 EVA_DB_DRIVER=mysql
-EVA_DB_SOURCE=<uname>:<password>@tcp\(<ip/domain>:3306\)/public
+EVA_DB_SOURCE=<uname>:<password>@tcp\(<ip/domain>:3306\)/<db-name>
 export EVA_DB_DRIVER
 export EVA_DB_SOURCE
 ```
