@@ -1,5 +1,5 @@
 FROM alpine:3.7
-MAINTAINER Lucas <6congyao@gmail.com>
+LABEL MAINTAINER "6congyao@gmail.com"
 
 RUN apk add --no-cache bash ca-certificates wget
 RUN wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://raw.githubusercontent.com/sgerrand/alpine-pkg-glibc/master/sgerrand.rsa.pub

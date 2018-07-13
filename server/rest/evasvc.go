@@ -134,7 +134,6 @@ func healthy(c *gin.Context) {
 	} else {
 		c.String(http.StatusOK, "Greetings! This is from %s \n", hostname)
 	}
-
 }
 
 func getPolicy(c *gin.Context) {

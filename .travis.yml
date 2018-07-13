@@ -13,7 +13,9 @@ install:
 script:
 - docker build --rm -t 6congyao/eva .
 after_success:
+- docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
 - if [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
-  docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
   docker push 6congyao/eva;
+  else echo $TRAVIS_BRANCH; docker tag 6congyao/eva 6congyao/eva:$TRAVIS_BRANCH;
+  docker push 6congyao/eva:$TRAVIS_BRANCH;
   fi
