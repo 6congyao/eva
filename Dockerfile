@@ -8,8 +8,6 @@ RUN apk add glibc-2.27-r0.apk
 
 ADD bin/alpine/evasvc /bin/
 
-ENV EVA_DB_DRIVER postgres
-
 EXPOSE 8080
 
 HEALTHCHECK CMD ["/bin/evasvc", "ping"]
