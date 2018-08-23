@@ -174,5 +174,5 @@ func (s *DefaultStatement) GetResources() []string {
 
 // AllowAccess returns true if the policy effect is allow, otherwise false.
 func (s *DefaultStatement) AllowAccess() bool {
-	return s.Effect == AllowAccess
+	return strings.ToLower(s.Effect) == AllowAccess
 }

@@ -6,7 +6,7 @@ Policy-based evaluation service.
 
 ## configure
 
-You need set two envs:  
+You must set two envs:  
 ```bash
 # use postgres
 EVA_DB_DRIVER=postgres
@@ -17,6 +17,15 @@ EVA_DB_SOURCE=<uname>:<password>@tcp\(<ip/domain>:3306\)/<db-name>
 ----------------------------------------------------------------------
 export EVA_DB_DRIVER
 export EVA_DB_SOURCE
+```
+
+Optionally set the port:
+
+```bash
+# use 9090
+PORT=9090
+----------------------------------------------------------------------
+export PORT
 ```
 
 ## API
