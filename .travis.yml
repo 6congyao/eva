@@ -3,7 +3,7 @@ language: go
 services:
 - docker
 go:
-- 1.10.2
+- 1.11
 go_import_path: eva
 before_install:
 - chmod +x release
